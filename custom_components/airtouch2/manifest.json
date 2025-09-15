@@ -1,0 +1,13 @@
+{
+  "domain": "airtouch2",
+  "name": "AirTouch 2",
+  "codeowners": ["@nathanvdh"],
+  "config_flow": true,
+  "dependencies": [],
+  "documentation": "https://github.com/nathanvdh/airtouch2-python",
+  "integration_type": "hub",
+  "iot_class": "local_polling",
+  "issue_tracker": "https://github.com/nathanvdh/airtouch2-python/issues",
+  "requirements": ["airtouch2>=0.8.6"],
+  "version": "1.0.0"
+}
