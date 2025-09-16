@@ -1,0 +1,24 @@
+{
+  "config": {
+    "step": {
+      "user": {
+        "title": "Enter AirTouch2 host IP",
+        "data": {
+          "host": "Host"
+        }
+      },
+      "confirm": {
+        "description": "Do you want to set up AirTouch2?"
+      }
+    },
+    "abort": {
+      "single_instance_allowed": "Only a single configuration of AirTouch2 is allowed.",
+      "no_devices_found": "No devices found on the network",
+      "already_configured": "Device is already configured"
+    },
+    "error": {
+      "cannot_connect": "Failed to connect",
+      "no_units": "No AC units were found"
+    }
+  }
+}

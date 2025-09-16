@@ -1,14 +1,14 @@
-"""AirTouch 2 component to control AirTouch 2 Climate Device."""
+"""AirTouch 2 component to control AirTouch 2 Zones."""
 from __future__ import annotations
-
-from airtouch2.at2 import At2Client
-from .Airtouch2ClimateEntity import Airtouch2ClimateEntity
-from .const import DOMAIN
-
 import logging
 from pprint import pprint
 
-from homeassistant.components.climate import ClimateEntity
+from airtouch2.at2 import At2Client
+from .Airtouch2GroupEntity import AirTouch2GroupEntity
+from .const import DOMAIN
+
+
+from homeassistant.components.fan import FanEntity
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
@@ -21,10 +21,11 @@ async def async_setup_entry(
     config_entry: ConfigEntry,
     async_add_entities: AddEntitiesCallback,
 ) -> None:
-    """Set up the Airtouch 2."""
+    """Set up the AirTouch 2 group entities."""
+    _LOGGER.debug("Setting up AirTouch 2 group entities")
     airtouch2_client: At2Client = hass.data[DOMAIN][config_entry.entry_id]
-    entities: list[ClimateEntity] = [
-        Airtouch2ClimateEntity(ac) for ac in airtouch2_client.aircons_by_id.values()
+    entities: list[FanEntity] = [
+        AirTouch2GroupEntity(group) for group in airtouch2_client.groups_by_id.values()
     ]
 
     if entities:
