@@ -1,42 +1,37 @@
-from .airtouch2.protocol.at2.enums import ACFanSpeed, ACMode
-from homeassistant.components.climate import (
-    FAN_AUTO,
-    FAN_DIFFUSE,
-    FAN_FOCUS,
-    FAN_HIGH,
-    FAN_LOW,
-    FAN_MEDIUM,
-    HVACMode
-)
+
+import logging
+from .airtouch2.protocol.at2.constants import OPEN_ISSUE_TEXT
+from typing import Optional
+from .airtouch2.protocol.at2.enums import ACBrand, ACFanSpeed
+from .airtouch2.protocol.at2.lookups import GATEWAYID_BRAND_LOOKUP
+
+_LOGGER = logging.getLogger(__name__)
 
 
-AT2_TO_HA_MODE = {
-    ACMode.AUTO: HVACMode.HEAT_COOL,
-    ACMode.HEAT: HVACMode.HEAT,
-    ACMode.DRY: HVACMode.DRY,
-    ACMode.FAN: HVACMode.FAN_ONLY,
-    ACMode.COOL: HVACMode.COOL,
-    ACMode.MITSUBISHI_MODE_130: HVACMode.HEAT,  # Map Mitsubishi mode 130 to HEAT
-    ACMode.MITSUBISHI_MODE_223: HVACMode.HEAT_COOL,  # Map Mitsubishi mode 223 to AUTO
-}
+def fan_speed_from_val(supported_speeds: list[ACFanSpeed], speed_val: int) -> ACFanSpeed:
+    if speed_val < 5:
+        # Units with no Auto speed still start with low == 1
+        if ACFanSpeed.AUTO not in supported_speeds:
+            speed_val -= 1
+        return supported_speeds[speed_val]
+    else:
+        return ACFanSpeed.AUTO
 
-AT2_TO_HA_FAN_SPEED = {
-    ACFanSpeed.AUTO: FAN_AUTO,
-    ACFanSpeed.QUIET: FAN_DIFFUSE,
-    ACFanSpeed.LOW: FAN_LOW,
-    ACFanSpeed.MEDIUM: FAN_MEDIUM,
-    ACFanSpeed.HIGH: FAN_HIGH,
-    ACFanSpeed.POWERFUL: FAN_FOCUS,
-}
 
-# inverse lookups - handle duplicates properly
-HA_MODE_TO_AT2 = {
-    HVACMode.HEAT_COOL: ACMode.AUTO,
-    HVACMode.HEAT: ACMode.HEAT,  # Prefer standard HEAT over Mitsubishi mode 130
-    HVACMode.DRY: ACMode.DRY,
-    HVACMode.FAN_ONLY: ACMode.FAN,
-    HVACMode.COOL: ACMode.COOL,
-}
+def val_from_fan_speed(supported_speeds: list[ACFanSpeed], speed: ACFanSpeed):
+    speed_val = supported_speeds.index(speed)
+    # Units with no Auto speed still start with low == 1
+    if ACFanSpeed.AUTO not in supported_speeds:
+        speed_val += 1
+    return speed_val
 
-HA_FAN_SPEED_TO_AT2 = {value: key for key,
-                       value in AT2_TO_HA_FAN_SPEED.items()}
+
+def brand_from_gateway_id(gateway_id: int) -> Optional[ACBrand]:
+    if gateway_id > 0:
+        if gateway_id in GATEWAYID_BRAND_LOOKUP:
+            return GATEWAYID_BRAND_LOOKUP[gateway_id]
+        else:
+            _LOGGER.warning(
+                f"AC has an unfamiliar gateway ID: {hex(gateway_id)} - " + OPEN_ISSUE_TEXT +
+                "\nInclude the gateway ID shown above")
+    return None
