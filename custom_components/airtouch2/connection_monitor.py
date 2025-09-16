@@ -6,7 +6,7 @@ import logging
 from datetime import datetime, timedelta
 from typing import Callable, Optional
 
-from airtouch2.at2 import At2Client
+from .airtouch2.at2 import At2Client
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers.event import async_track_time_interval
 from homeassistant.util import dt as dt_util

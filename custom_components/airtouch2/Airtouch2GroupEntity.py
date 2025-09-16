@@ -3,7 +3,7 @@
 import logging
 from typing import Any, final
 
-from airtouch2.at2 import At2Group
+from .airtouch2.at2 import At2Group
 from homeassistant.components.fan import FanEntity, FanEntityFeature
 from homeassistant.helpers.entity import DeviceInfo
 

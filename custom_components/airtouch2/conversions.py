@@ -1,4 +1,4 @@
-from airtouch2.protocol.at2.enums import ACFanSpeed, ACMode
+from .airtouch2.protocol.at2.enums import ACFanSpeed, ACMode
 from homeassistant.components.climate import (
     FAN_AUTO,
     FAN_DIFFUSE,

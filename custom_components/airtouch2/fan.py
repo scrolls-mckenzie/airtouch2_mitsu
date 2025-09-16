@@ -3,7 +3,7 @@ from __future__ import annotations
 import logging
 from pprint import pprint
 
-from airtouch2.at2 import At2Client
+from .airtouch2.at2 import At2Client
 from .Airtouch2GroupEntity import AirTouch2GroupEntity
 from .const import DOMAIN
 
