@@ -92,48 +92,32 @@ async def _async_register_services(hass: HomeAssistant) -> None:
     
     async def async_reconnect_service(call: ServiceCall) -> None:
         """Service to force reconnect AirTouch2."""
-        device_id = call.data.get("device_id")
+        _LOGGER.info("AirTouch2 reconnect service called")
         
-        if device_id:
-            # Find the config entry for this device
-            device_registry = dr.async_get(hass)
-            device = device_registry.async_get(device_id)
-            
-            if not device:
-                _LOGGER.error("Device not found: %s", device_id)
-                return
-                
-            # Find config entry
-            config_entry_id = None
-            for identifier in device.identifiers:
-                if identifier[0] == DOMAIN:
-                    # Find config entry by checking all entries
-                    for entry_id, data in hass.data[DOMAIN].items():
-                        if entry_id in hass.config_entries.async_entries(DOMAIN):
-                            config_entry_id = entry_id
-                            break
-                    break
-                    
-            if config_entry_id and config_entry_id in hass.data[DOMAIN]:
-                monitor = hass.data[DOMAIN][config_entry_id]["monitor"]
-                success = await monitor.force_reconnect()
-                if success:
-                    _LOGGER.info("Successfully reconnected AirTouch2")
-                else:
-                    _LOGGER.error("Failed to reconnect AirTouch2")
-            else:
-                _LOGGER.error("Could not find AirTouch2 integration for device")
+        # Reconnect all AirTouch2 integrations
+        reconnected_count = 0
+        for entry_id, data in hass.data[DOMAIN].items():
+            if isinstance(data, dict) and "monitor" in data:
+                monitor = data["monitor"]
+                try:
+                    success = await monitor.force_reconnect()
+                    if success:
+                        reconnected_count += 1
+                        _LOGGER.info("Successfully reconnected AirTouch2 integration %s", entry_id)
+                    else:
+                        _LOGGER.error("Failed to reconnect AirTouch2 integration %s", entry_id)
+                except Exception as err:
+                    _LOGGER.error("Error reconnecting AirTouch2 integration %s: %s", entry_id, err)
+        
+        if reconnected_count > 0:
+            _LOGGER.info("Reconnected %d AirTouch2 integration(s)", reconnected_count)
         else:
-            # Reconnect all AirTouch2 integrations
-            for entry_id, data in hass.data[DOMAIN].items():
-                if isinstance(data, dict) and "monitor" in data:
-                    monitor = data["monitor"]
-                    await monitor.force_reconnect()
+            _LOGGER.warning("No AirTouch2 integrations were reconnected")
     
-    # Register the reconnect service
-    hass.services.async_register(
-        DOMAIN,
-        "reconnect",
-        async_reconnect_service,
-        schema=None,  # We'll accept any data
-    )
+    # Register the reconnect service (only register once)
+    if not hass.services.has_service(DOMAIN, "reconnect"):
+        hass.services.async_register(
+            DOMAIN,
+            "reconnect",
+            async_reconnect_service,
+        )
