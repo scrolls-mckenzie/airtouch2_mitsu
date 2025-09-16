@@ -1,14 +1,14 @@
 {
   "domain": "airtouch2",
   "name": "airtouch2",
-  "codeowners": ["@nathanvdh"],
+  "codeowners": ["@scrollsmckenzie"],
   "config_flow": true,
   "dependencies": [],
-  "documentation": "https://github.com/nathanvdh/airtouch2-python",
+  "documentation": "https://github.com/scrolls-mckenzie/airtouch2-python",
   "homekit": {},
   "iot_class": "local_push",
-  "issue_tracker": "https://github.com/nathanvdh/airtouch2-python/issues",
-  "requirements": ["airtouch2>=0.8.6"],
+  "issue_tracker": "https://github.com/scrolls-mckenzie/airtouch2-python/issues",
+  "requirements": [],
   "ssdp": [],
   "version": "1.0.0",
   "zeroconf": []
