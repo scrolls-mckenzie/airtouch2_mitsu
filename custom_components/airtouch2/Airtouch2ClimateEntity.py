@@ -1,5 +1,5 @@
-from airtouch2.at2 import At2Aircon
-from airtouch2.protocol.at2.enums import ACMode
+from .airtouch2.at2 import At2Aircon
+from .airtouch2.protocol.at2.enums import ACMode
 from .conversions import (
     AT2_TO_HA_MODE,
     AT2_TO_HA_FAN_SPEED,
