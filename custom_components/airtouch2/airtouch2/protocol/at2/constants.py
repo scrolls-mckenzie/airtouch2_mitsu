@@ -74,4 +74,4 @@ class ResponseMessageOffsets(IntEnum):
     HASH = 394
 
 
-OPEN_ISSUE_TEXT = "please open an issue and detail your system:\n\thttps://github.com/nathanvdh/airtouch2-python/issues/new"
+OPEN_ISSUE_TEXT = "woops"
