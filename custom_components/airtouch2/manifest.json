@@ -1,7 +1,9 @@
 {
   "domain": "airtouch2",
   "name": "airtouch2",
-  "codeowners": ["@scrollsmckenzie"],
+  "codeowners": [
+    "@scrollsmckenzie"
+  ],
   "config_flow": true,
   "dependencies": [],
   "documentation": "https://github.com/scrolls-mckenzie/airtouch2-python",

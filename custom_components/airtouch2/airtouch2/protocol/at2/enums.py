@@ -8,7 +8,8 @@ class ACMode(IntEnum):
     FAN = 3
     COOL = 4
     # Mitsubishi Electric specific modes
-    MITSUBISHI_MODE_130 = 130  # Unknown Mitsubishi mode - maps to HEAT for now
+    MITSUBISHI_MODE_130 = 130  # Unknown Mitsubishi mode - maps to HEAT
+    MITSUBISHI_MODE_223 = 223  # Another unknown Mitsubishi mode - maps to AUTO
 
     def __str__(self):
         return self._name_

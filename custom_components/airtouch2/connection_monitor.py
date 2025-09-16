@@ -141,18 +141,26 @@ class AirTouch2ConnectionMonitor:
         try:
             # Trigger callbacks for all ACs and groups to update their entities
             for ac in self.client.aircons_by_id.values():
-                for callback in ac._callbacks:
-                    try:
-                        callback()
-                    except Exception as err:
-                        _LOGGER.debug("Error calling AC callback: %s", err)
+                try:
+                    for callback in ac._callbacks:
+                        try:
+                            callback()
+                        except Exception as err:
+                            _LOGGER.debug("Error calling AC callback: %s", err)
+                except AttributeError:
+                    # AC might not have _callbacks attribute
+                    pass
             
             for group in self.client.groups_by_id.values():
-                for callback in group._callbacks:
-                    try:
-                        callback()
-                    except Exception as err:
-                        _LOGGER.debug("Error calling group callback: %s", err)
+                try:
+                    for callback in group._callbacks:
+                        try:
+                            callback()
+                        except Exception as err:
+                            _LOGGER.debug("Error calling group callback: %s", err)
+                except AttributeError:
+                    # Group might not have _callbacks attribute
+                    pass
                         
         except Exception as err:
             _LOGGER.debug("Error forcing entity updates: %s", err)
