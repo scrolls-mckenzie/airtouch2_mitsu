@@ -76,6 +76,16 @@ class Airtouch2ClimateEntity(ClimateEntity):
         """Return if entity is available."""
         # Check if we have recent data from the AC
         return self._ac.info is not None
+    
+    @property
+    def should_poll(self) -> bool:
+        """Return True if entity has to be polled for state."""
+        return False
+    
+    async def async_update(self) -> None:
+        """Update the entity state."""
+        # Force a state write to ensure HA has the latest data
+        self.async_write_ha_state()
 
     async def async_added_to_hass(self) -> None:
         """Call when entity is added."""
@@ -86,13 +96,20 @@ class Airtouch2ClimateEntity(ClimateEntity):
     def _on_aircon_update(self) -> None:
         """Handle aircon update and notify connection monitor."""
         # Update connection monitor that we received data
-        if hasattr(self.hass.data[DOMAIN], 'values'):
+        try:
             for data in self.hass.data[DOMAIN].values():
                 if isinstance(data, dict) and "monitor" in data:
                     data["monitor"].update_last_seen()
                     break
+        except Exception:
+            pass  # Ignore errors in connection monitoring
         
-        # Update Home Assistant state
+        # Schedule state update on the event loop
+        if self.hass:
+            self.hass.async_create_task(self._async_update_ha_state())
+    
+    async def _async_update_ha_state(self) -> None:
+        """Update Home Assistant state asynchronously."""
         self.async_write_ha_state()
 
     #

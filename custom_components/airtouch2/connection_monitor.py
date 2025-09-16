@@ -4,7 +4,7 @@ from __future__ import annotations
 import asyncio
 import logging
 from datetime import datetime, timedelta
-from typing import Callable
+from typing import Callable, Optional
 
 from airtouch2.at2 import At2Client
 from homeassistant.core import HomeAssistant
@@ -20,7 +20,7 @@ class AirTouch2ConnectionMonitor:
         hass: HomeAssistant, 
         client: At2Client, 
         host: str,
-        reconnect_callback: Callable[[], None] | None = None
+        reconnect_callback: Optional[Callable[[], None]] = None
     ) -> None:
         """Initialize the connection monitor."""
         self.hass = hass
@@ -105,6 +105,9 @@ class AirTouch2ConnectionMonitor:
                 # Notify entities about reconnection
                 if self.reconnect_callback:
                     self.reconnect_callback()
+                
+                # Force update all entities
+                await self._force_entity_updates()
                     
             else:
                 _LOGGER.error("Failed to reconnect to AirTouch2, will retry later")
@@ -120,3 +123,24 @@ class AirTouch2ConnectionMonitor:
         _LOGGER.info("Force reconnecting AirTouch2 connection")
         await self._reconnect()
         return not self._reconnecting  # Return True if reconnection succeeded
+    
+    async def _force_entity_updates(self) -> None:
+        """Force all entities to update their state."""
+        try:
+            # Trigger callbacks for all ACs and groups to update their entities
+            for ac in self.client.aircons_by_id.values():
+                for callback in ac._callbacks:
+                    try:
+                        callback()
+                    except Exception as err:
+                        _LOGGER.debug("Error calling AC callback: %s", err)
+            
+            for group in self.client.groups_by_id.values():
+                for callback in group._callbacks:
+                    try:
+                        callback()
+                    except Exception as err:
+                        _LOGGER.debug("Error calling group callback: %s", err)
+                        
+        except Exception as err:
+            _LOGGER.debug("Error forcing entity updates: %s", err)

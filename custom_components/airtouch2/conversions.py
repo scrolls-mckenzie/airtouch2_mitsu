@@ -16,6 +16,7 @@ AT2_TO_HA_MODE = {
     ACMode.DRY: HVACMode.DRY,
     ACMode.FAN: HVACMode.FAN_ONLY,
     ACMode.COOL: HVACMode.COOL,
+    ACMode.MITSUBISHI_MODE_130: HVACMode.HEAT,  # Map unknown Mitsubishi mode to HEAT
 }
 
 AT2_TO_HA_FAN_SPEED = {
