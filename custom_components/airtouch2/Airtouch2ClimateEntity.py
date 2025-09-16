@@ -68,13 +68,32 @@ class Airtouch2ClimateEntity(ClimateEntity):
             name=self.name,
             manufacturer="Polyaire",
             model="Airtouch 2",
+            sw_version=f"AC {self._ac.info.number}",
         )
+    
+    @property
+    def available(self) -> bool:
+        """Return if entity is available."""
+        # Check if we have recent data from the AC
+        return self._ac.info is not None
 
     async def async_added_to_hass(self) -> None:
         """Call when entity is added."""
         # Add callback for when aircon receives new data.
         # Removes callback on remove.
-        self.async_on_remove(self._ac.add_callback(self.async_write_ha_state))
+        self.async_on_remove(self._ac.add_callback(self._on_aircon_update))
+        
+    def _on_aircon_update(self) -> None:
+        """Handle aircon update and notify connection monitor."""
+        # Update connection monitor that we received data
+        if hasattr(self.hass.data[DOMAIN], 'values'):
+            for data in self.hass.data[DOMAIN].values():
+                if isinstance(data, dict) and "monitor" in data:
+                    data["monitor"].update_last_seen()
+                    break
+        
+        # Update Home Assistant state
+        self.async_write_ha_state()
 
     #
     # ClimateEntity overrides:

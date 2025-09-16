@@ -22,7 +22,8 @@ async def async_setup_entry(
     async_add_entities: AddEntitiesCallback,
 ) -> None:
     """Set up the Airtouch 2."""
-    airtouch2_client: At2Client = hass.data[DOMAIN][config_entry.entry_id]
+    data = hass.data[DOMAIN][config_entry.entry_id]
+    airtouch2_client: At2Client = data["client"]
     entities: list[ClimateEntity] = [
         Airtouch2ClimateEntity(ac) for ac in airtouch2_client.aircons_by_id.values()
     ]

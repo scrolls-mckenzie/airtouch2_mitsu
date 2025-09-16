@@ -10,6 +10,9 @@ A Home Assistant custom component for controlling Polyaire AirTouch 2 systems wi
 - ✅ **Crash Prevention**: Fixed crashes when AC reports unknown mode values
 - ✅ **Enhanced Stability**: Improved error handling and defensive programming
 - ✅ **Better Logging**: More informative error messages and warnings
+- 🆕 **Auto-Reconnection**: Automatic connection monitoring and reconnection
+- 🆕 **Manual Reconnect Service**: Force reconnect without restarting HA
+- 🆕 **Connection Status**: Entities show as unavailable when connection is lost
 
 ## Features
 
@@ -65,6 +68,40 @@ Or use the provided installation script:
 - One fan entity per zone group
 - Control damper position (0-100%)
 - Turn zones on/off
+
+## Connection Management
+
+### Automatic Reconnection
+The integration includes automatic connection monitoring that:
+- Checks connection health every 30 seconds
+- Automatically reconnects if no data received for 2 minutes
+- Updates entity availability status
+- Logs connection issues for troubleshooting
+
+### Manual Reconnection
+If you need to manually reconnect without restarting Home Assistant:
+
+**Via Service Call:**
+```yaml
+service: airtouch2.reconnect
+```
+
+**Via Developer Tools:**
+1. Go to Developer Tools → Services
+2. Select `airtouch2.reconnect`
+3. Click "Call Service"
+
+**Via Automation:**
+```yaml
+- service: airtouch2.reconnect
+  data: {}
+```
+
+### Integration Reload
+You can also reload the entire integration:
+1. Go to Settings → Devices & Services
+2. Find "AirTouch 2" integration
+3. Click the three dots → "Reload"
 
 ## Troubleshooting
 

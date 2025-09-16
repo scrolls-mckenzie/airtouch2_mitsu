@@ -23,7 +23,8 @@ async def async_setup_entry(
 ) -> None:
     """Set up the AirTouch 2 group entities."""
     _LOGGER.debug("Setting up AirTouch 2 group entities")
-    airtouch2_client: At2Client = hass.data[DOMAIN][config_entry.entry_id]
+    data = hass.data[DOMAIN][config_entry.entry_id]
+    airtouch2_client: At2Client = data["client"]
     entities: list[FanEntity] = [
         AirTouch2GroupEntity(group) for group in airtouch2_client.groups_by_id.values()
     ]

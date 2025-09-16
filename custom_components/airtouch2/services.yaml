@@ -1,0 +1,11 @@
+reconnect:
+  name: Reconnect AirTouch2
+  description: Force reconnect to AirTouch2 system
+  fields:
+    device_id:
+      name: Device ID
+      description: Device ID of the AirTouch2 system (optional - if not provided, all systems will be reconnected)
+      required: false
+      selector:
+        device:
+          integration: airtouch2
