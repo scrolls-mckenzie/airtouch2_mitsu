@@ -168,23 +168,22 @@ class Airtouch2ClimateEntity(ClimateEntity):
     async def async_set_hvac_mode(self, hvac_mode: HVACMode) -> None:
         """Set new target hvac mode."""
         if hvac_mode == HVACMode.OFF:
-            # Only turn off if currently active
-            if self._ac.info.active:
-                await self.async_turn_off()
+            # Turn off the AC
+            await self.async_turn_off()
         else:
             # Check if the mode is available in our conversion table
             if hvac_mode not in HA_MODE_TO_AT2:
                 _LOGGER.error("Unsupported HVAC mode: %s", hvac_mode)
                 return
-                
-            # If AC is off, turn it on first, then set mode
-            if not self._ac.info.active:
-                await self.async_turn_on()
-                # Wait a moment for the AC to turn on before setting mode
-                await asyncio.sleep(0.5)
             
-            # Set the mode (only if AC is on or we just turned it on)
+            # Always ensure AC is on when setting a mode (turn on if needed)
+            if not self._ac.info.active:
+                await self._ac.turn_on()
+                _LOGGER.debug("Turned on AC %s for mode change", self._ac.info.name)
+            
+            # Set the mode
             await self._ac.set_mode(HA_MODE_TO_AT2[hvac_mode])
+            _LOGGER.debug("Set mode to %s for AC %s", hvac_mode, self._ac.info.name)
             
         # Immediately update the state for responsive UI
         self.async_write_ha_state()
