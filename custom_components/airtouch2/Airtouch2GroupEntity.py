@@ -68,6 +68,8 @@ class AirTouch2GroupEntity(FanEntity):
         # clamp between 1 and 10
         damp = max(min(damp, 10), 1)
         await self._group.set_damp(damp)
+        # Immediately update the state for responsive UI
+        self.async_write_ha_state()
 
     async def async_turn_on(
         self,
@@ -80,6 +82,9 @@ class AirTouch2GroupEntity(FanEntity):
             await self._group.turn_on()
         if percentage:
             await self.async_set_percentage(percentage)
+        else:
+            # Immediately update the state for responsive UI
+            self.async_write_ha_state()
 
     @property
     def is_on(self):
@@ -115,3 +120,5 @@ class AirTouch2GroupEntity(FanEntity):
         """Turn off the group."""
         if self._group.info.active:
             await self._group.turn_off()
+            # Immediately update the state for responsive UI
+            self.async_write_ha_state()
