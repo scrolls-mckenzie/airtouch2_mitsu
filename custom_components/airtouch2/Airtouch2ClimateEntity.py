@@ -156,10 +156,14 @@ class Airtouch2ClimateEntity(ClimateEntity):
         if temp > 0:  # Only set if we have a valid temperature
             await self._ac.set_set_temp(temp)
             _LOGGER.debug("Set temperature to %d for AC %s", temp, self._ac.info.name)
+            # Immediately update the state for responsive UI
+            self.async_write_ha_state()
 
     async def async_set_fan_mode(self, fan_mode: str) -> None:
         """Set new target fan mode."""
         await self._ac.set_fan_speed(HA_FAN_SPEED_TO_AT2[fan_mode])
+        # Immediately update the state for responsive UI
+        self.async_write_ha_state()
 
     async def async_set_hvac_mode(self, hvac_mode: HVACMode) -> None:
         """Set new target hvac mode."""
@@ -181,18 +185,25 @@ class Airtouch2ClimateEntity(ClimateEntity):
             
             # Set the mode (only if AC is on or we just turned it on)
             await self._ac.set_mode(HA_MODE_TO_AT2[hvac_mode])
+            
+        # Immediately update the state for responsive UI
+        self.async_write_ha_state()
 
     async def async_turn_on(self):
         """Turn on."""
         if not self._ac.info.active:
             await self._ac.turn_on()
             _LOGGER.debug("Turned on AC %s", self._ac.info.name)
+            # Immediately update the state for responsive UI
+            self.async_write_ha_state()
 
     async def async_turn_off(self):
         """Turn off."""
         if self._ac.info.active:
             await self._ac.turn_off()
             _LOGGER.debug("Turned off AC %s", self._ac.info.name)
+            # Immediately update the state for responsive UI
+            self.async_write_ha_state()
 
     @property
     def supported_features(self) -> ClimateEntityFeature:
