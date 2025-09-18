@@ -1,23 +1,7 @@
 {
-  "build_timestamp": "2025-09-16T17:31:37.623229",
+  "build_timestamp": "2025-09-18T17:31:44.969155",
   "library_version": "1.0.0",
-  "library_hash": "595dfbf9cbb16cafb5831cf7d7394d0fc2c0fcf8ac9ea8bf2464b6a1ecaa0136",
+  "library_hash": "sync_hash",
   "integration_version": "1.0.0",
-  "validation_results": [
-    {
-      "check": "file_integrity",
-      "status": "passed",
-      "message": "All 13 files passed integrity check"
-    },
-    {
-      "check": "manifest_structure",
-      "status": "passed",
-      "message": "Manifest structure validation passed"
-    },
-    {
-      "check": "bundled_library",
-      "status": "passed",
-      "message": "Bundled library validation passed (40 files)"
-    }
-  ]
+  "validation_results": []
 }
