@@ -126,6 +126,8 @@ class AirTouch2ConnectionMonitor:
                 
         except Exception as err:
             _LOGGER.error("Error during AirTouch2 reconnection: %s", err)
+            # Add debug info to help identify the issue
+            _LOGGER.debug("Reconnection error details: %s", str(err))
             
         finally:
             self._reconnecting = False

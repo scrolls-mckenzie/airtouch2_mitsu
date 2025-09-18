@@ -3,6 +3,9 @@
 import logging
 from typing import Any, final
 
+# Version identifier for debugging
+_VERSION_ID = "v2024.09.18-fixes"
+
 from .airtouch2.at2 import At2Group
 from homeassistant.components.fan import FanEntity, FanEntityFeature
 from homeassistant.helpers.entity import DeviceInfo
@@ -24,6 +27,7 @@ class AirTouch2GroupEntity(FanEntity):
     def __init__(self, group: At2Group) -> None:
         """Initialize the fan entity."""
         self._group = group
+        _LOGGER.debug(f"Initializing AirTouch2 group entity {_VERSION_ID}")
 
     #
     # Entity overrides:
