@@ -1,11 +1,11 @@
 from __future__ import annotations
 from dataclasses import dataclass
 
-from .common.interfaces import Serializable
-from .protocol.at2plus.control_status_common import CONTROL_STATUS_SUBHEADER_LENGTH, ControlStatusSubHeader, ControlStatusSubType, SubDataLength
-from .protocol.at2plus.enums import GroupPower
-from .common.Buffer import Buffer
-from .protocol.at2plus.message_common import AddressMsgType, Header, MessageType, add_checksum_message_buffer, prime_message_buffer
+from ..common.interfaces import Serializable
+from ..protocol.at2plus.control_status_common import CONTROL_STATUS_SUBHEADER_LENGTH, ControlStatusSubHeader, ControlStatusSubType, SubDataLength
+from ..protocol.at2plus.enums import GroupPower
+from ..common.Buffer import Buffer
+from ..protocol.at2plus.message_common import AddressMsgType, Header, MessageType, add_checksum_message_buffer, prime_message_buffer
 
 GROUP_STATUS_LENGTH = 8
 

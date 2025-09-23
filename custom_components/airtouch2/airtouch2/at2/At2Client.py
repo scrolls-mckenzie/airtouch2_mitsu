@@ -2,13 +2,13 @@ import asyncio
 from datetime import datetime
 import logging
 
-from .common.NetClient import NetClient
-from .protocol.at2.constants import MessageLength
-from .protocol.at2.messages import RequestState, SystemInfo
+from ..common.NetClient import NetClient
+from ..protocol.at2.constants import MessageLength
+from ..protocol.at2.messages import RequestState, SystemInfo
 from typing import Optional
-from .at2.At2Aircon import At2Aircon
-from .at2.At2Group import At2Group
-from .common.interfaces import add_callback, Callback, Serializable, TaskCreator
+from .At2Aircon import At2Aircon
+from .At2Group import At2Group
+from ..common.interfaces import add_callback, Callback, Serializable, TaskCreator
 
 _LOGGER = logging.getLogger(__name__)
 

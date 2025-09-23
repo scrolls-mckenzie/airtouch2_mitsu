@@ -1,9 +1,9 @@
 
 import logging
-from .protocol.at2.constants import OPEN_ISSUE_TEXT
+from ..protocol.at2.constants import OPEN_ISSUE_TEXT
 from typing import Optional
-from .protocol.at2.enums import ACBrand, ACFanSpeed
-from .protocol.at2.lookups import GATEWAYID_BRAND_LOOKUP
+from ..protocol.at2.enums import ACBrand, ACFanSpeed
+from ..protocol.at2.lookups import GATEWAYID_BRAND_LOOKUP
 
 _LOGGER = logging.getLogger(__name__)
 

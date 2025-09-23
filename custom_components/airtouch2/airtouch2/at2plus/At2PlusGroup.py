@@ -1,13 +1,13 @@
 from __future__ import annotations
 from typing import TYPE_CHECKING
 
-from .common.interfaces import Callback
-from .protocol.at2plus.enums import GroupPower, GroupSetDamper, GroupSetPower
-from .protocol.at2plus.messages.GroupControl import GroupControlMessage, GroupSettings
-from .protocol.at2plus.messages.GroupStatus import GroupStatus
+from ..common.interfaces import Callback
+from ..protocol.at2plus.enums import GroupPower, GroupSetDamper, GroupSetPower
+from ..protocol.at2plus.messages.GroupControl import GroupControlMessage, GroupSettings
+from ..protocol.at2plus.messages.GroupStatus import GroupStatus
 
 if TYPE_CHECKING:
-    from .at2plus.At2PlusClient import At2PlusClient
+    from .At2PlusClient import At2PlusClient
 
 
 class At2PlusGroup:
