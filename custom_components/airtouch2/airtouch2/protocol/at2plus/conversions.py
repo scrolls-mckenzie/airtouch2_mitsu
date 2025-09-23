@@ -1,4 +1,4 @@
-from .protocol.at2plus.constants import Limits
+from ..protocol.at2plus.constants import Limits
 
 
 def value_from_setpoint(setpoint: float | None) -> int:

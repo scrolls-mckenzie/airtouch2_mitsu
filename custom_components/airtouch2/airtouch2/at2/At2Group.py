@@ -1,10 +1,10 @@
 from __future__ import annotations
 from typing import TYPE_CHECKING
-from .protocol.at2.messages.SystemInfo import GroupInfo
-from .protocol.at2.messages import ChangeDamper, ToggleGroup
-from .common.interfaces import Publisher, Callback, add_callback
+from ..protocol.at2.messages.SystemInfo import GroupInfo
+from ..protocol.at2.messages import ChangeDamper, ToggleGroup
+from ..common.interfaces import Publisher, Callback, add_callback
 if TYPE_CHECKING:
-    from .at2.At2Client import At2Client
+    from .At2Client import At2Client
 
 
 class At2Group(Publisher):

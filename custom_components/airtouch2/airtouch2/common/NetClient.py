@@ -3,7 +3,7 @@ import errno
 import logging
 import socket
 from typing import Callable, Optional
-from .common.interfaces import CoroCallback, Serializable, TaskCreator
+from ..common.interfaces import CoroCallback, Serializable, TaskCreator
 
 _LOGGER = logging.getLogger(__name__)
 
