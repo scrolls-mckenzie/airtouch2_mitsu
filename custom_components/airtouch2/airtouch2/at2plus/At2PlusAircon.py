@@ -1,13 +1,13 @@
 from __future__ import annotations
 from typing import TYPE_CHECKING
-from airtouch2.protocol.at2plus.messages.AcControl import AcControlMessage, AcSettings
-from airtouch2.common.interfaces import Callback
+from .protocol.at2plus.messages.AcControl import AcControlMessage, AcSettings
+from .common.interfaces import Callback
 if TYPE_CHECKING:
-    from airtouch2.at2plus.At2PlusClient import At2PlusClient
+    from .at2plus.At2PlusClient import At2PlusClient
 from asyncio import Event
-from airtouch2.protocol.at2plus.enums import AcFanSpeed, AcPower, AcSetMode, AcSetPower
-from airtouch2.protocol.at2plus.messages.AcAbilityMessage import AcAbility
-from airtouch2.protocol.at2plus.messages.AcStatus import AcStatus
+from .protocol.at2plus.enums import AcFanSpeed, AcPower, AcSetMode, AcSetPower
+from .protocol.at2plus.messages.AcAbilityMessage import AcAbility
+from .protocol.at2plus.messages.AcStatus import AcStatus
 
 
 class At2PlusAircon:

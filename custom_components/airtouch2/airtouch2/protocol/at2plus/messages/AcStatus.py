@@ -1,12 +1,12 @@
 
 from __future__ import annotations
 from dataclasses import dataclass
-from airtouch2.protocol.at2plus.conversions import setpoint_from_value, temperature_from_value, value_from_setpoint, value_from_temperature
-from airtouch2.protocol.at2plus.control_status_common import CONTROL_STATUS_SUBHEADER_LENGTH, ControlStatusSubType, SubDataLength, ControlStatusSubHeader
-from airtouch2.protocol.at2plus.enums import AcFanSpeed, AcMode, AcPower
-from airtouch2.protocol.at2plus.message_common import AddressMsgType, Header, MessageType, add_checksum_message_buffer, prime_message_buffer
-from airtouch2.common.Buffer import Buffer
-from airtouch2.common.interfaces import Serializable
+from .protocol.at2plus.conversions import setpoint_from_value, temperature_from_value, value_from_setpoint, value_from_temperature
+from .protocol.at2plus.control_status_common import CONTROL_STATUS_SUBHEADER_LENGTH, ControlStatusSubType, SubDataLength, ControlStatusSubHeader
+from .protocol.at2plus.enums import AcFanSpeed, AcMode, AcPower
+from .protocol.at2plus.message_common import AddressMsgType, Header, MessageType, add_checksum_message_buffer, prime_message_buffer
+from .common.Buffer import Buffer
+from .common.interfaces import Serializable
 
 AC_STATUS_LENGTH = 10
 

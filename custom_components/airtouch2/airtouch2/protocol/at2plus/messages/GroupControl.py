@@ -1,12 +1,12 @@
 from __future__ import annotations
 # from dataclasses import dataclass
-from airtouch2.common.Buffer import Buffer
+from .common.Buffer import Buffer
 
-from airtouch2.common.interfaces import Serializable
-from airtouch2.protocol.at2plus.constants import Limits
-from airtouch2.protocol.at2plus.control_status_common import CONTROL_STATUS_SUBHEADER_LENGTH, ControlStatusSubHeader, ControlStatusSubType, SubDataLength
-from airtouch2.protocol.at2plus.enums import GroupSetDamper, GroupSetPower
-from airtouch2.protocol.at2plus.message_common import AddressMsgType, Header, MessageType, add_checksum_message_buffer, prime_message_buffer
+from .common.interfaces import Serializable
+from .protocol.at2plus.constants import Limits
+from .protocol.at2plus.control_status_common import CONTROL_STATUS_SUBHEADER_LENGTH, ControlStatusSubHeader, ControlStatusSubType, SubDataLength
+from .protocol.at2plus.enums import GroupSetDamper, GroupSetPower
+from .protocol.at2plus.message_common import AddressMsgType, Header, MessageType, add_checksum_message_buffer, prime_message_buffer
 
 
 GROUP_SETTINGS_LENGTH = 4
