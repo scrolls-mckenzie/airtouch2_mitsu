@@ -1,5 +1,5 @@
-from ......protocol.at2.message_common import add_checksum_message_buffer
-from ......protocol.at2.constants import CommandMessageConstants, CommandMessageType, MessageLength
+from ..message_common import add_checksum_message_buffer
+from ..constants import CommandMessageConstants, CommandMessageType, MessageLength
 from ......common.Buffer import Buffer
 from ......common.interfaces import Serializable
 

@@ -2,9 +2,9 @@
 from __future__ import annotations
 from dataclasses import dataclass
 from enum import IntEnum
-from ......protocol.at2plus.enums import AcFanSpeed, AcSetMode
-from ......protocol.at2plus.extended_common import EXTENDED_SUBHEADER_LENGTH, ExtendedMessageSubType, ExtendedSubHeader
-from ......protocol.at2plus.message_common import AddressMsgType, Header, MessageType, add_checksum_message_buffer, prime_message_buffer
+from ..enums import AcFanSpeed, AcSetMode
+from ..extended_common import EXTENDED_SUBHEADER_LENGTH, ExtendedMessageSubType, ExtendedSubHeader
+from ..message_common import AddressMsgType, Header, MessageType, add_checksum_message_buffer, prime_message_buffer
 from ......common.interfaces import Serializable
 
 
