@@ -1,9 +1,9 @@
-from airtouch2.protocol.at2.conversions import val_from_fan_speed
-from airtouch2.protocol.at2.message_common import add_checksum_message_buffer
-from airtouch2.protocol.at2.constants import ACCommands, CommandMessageConstants, CommandMessageType, MessageLength
-from airtouch2.protocol.at2.enums import ACFanSpeed, ACMode
-from airtouch2.common.Buffer import Buffer
-from airtouch2.common.interfaces import Serializable
+from .airtouch2.protocol.at2.conversions import val_from_fan_speed
+from .airtouch2.protocol.at2.message_common import add_checksum_message_buffer
+from .airtouch2.protocol.at2.constants import ACCommands, CommandMessageConstants, CommandMessageType, MessageLength
+from .airtouch2.protocol.at2.enums import ACFanSpeed, ACMode
+from .airtouch2.common.Buffer import Buffer
+from .airtouch2.common.interfaces import Serializable
 
 
 def prime_ac_control_message_buffer(target_ac: int) -> Buffer:

@@ -1,6 +1,6 @@
-from airtouch2.common.interfaces import Serializable
-from airtouch2.protocol.at2plus.extended_common import EXTENDED_SUBHEADER_LENGTH, ExtendedMessageSubType, ExtendedSubHeader
-from airtouch2.protocol.at2plus.message_common import AddressMsgType, Header, MessageType, add_checksum_message_buffer, prime_message_buffer
+from .airtouch2.common.interfaces import Serializable
+from .airtouch2.protocol.at2plus.extended_common import EXTENDED_SUBHEADER_LENGTH, ExtendedMessageSubType, ExtendedSubHeader
+from .airtouch2.protocol.at2plus.message_common import AddressMsgType, Header, MessageType, add_checksum_message_buffer, prime_message_buffer
 
 
 def group_names_from_subdata(subdata: bytes) -> dict[int, str]:

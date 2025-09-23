@@ -1,10 +1,10 @@
 from __future__ import annotations
 from typing import TYPE_CHECKING
-from airtouch2.protocol.at2.messages.SystemInfo import GroupInfo
-from airtouch2.protocol.at2.messages import ChangeDamper, ToggleGroup
-from airtouch2.common.interfaces import Publisher, Callback, add_callback
+from .airtouch2.protocol.at2.messages.SystemInfo import GroupInfo
+from .airtouch2.protocol.at2.messages import ChangeDamper, ToggleGroup
+from .airtouch2.common.interfaces import Publisher, Callback, add_callback
 if TYPE_CHECKING:
-    from airtouch2.at2.At2Client import At2Client
+    from .airtouch2.at2.At2Client import At2Client
 
 
 class At2Group(Publisher):

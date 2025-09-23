@@ -2,19 +2,19 @@ import asyncio
 from datetime import datetime
 import logging
 
-from airtouch2.at2plus.At2PlusAircon import At2PlusAircon
-from airtouch2.at2plus.At2PlusGroup import At2PlusGroup
-from airtouch2.common.NetClient import NetClient
-from airtouch2.protocol.at2plus.control_status_common import ControlStatusSubHeader, ControlStatusSubType
-from airtouch2.protocol.at2plus.extended_common import ExtendedMessageSubType, ExtendedSubHeader
-from airtouch2.protocol.at2plus.message_common import HEADER_LENGTH, HEADER_MAGIC, Header, Message, MessageType
-from airtouch2.protocol.at2plus.messages.AcAbilityMessage import AcAbility, AcAbilityMessage, RequestAcAbilityMessage
-from airtouch2.protocol.at2plus.messages.AcStatus import AcStatusMessage
-from airtouch2.common.Buffer import Buffer
-from airtouch2.protocol.at2plus.crc16_modbus import crc16
-from airtouch2.common.interfaces import Callback, Serializable, TaskCreator
-from airtouch2.protocol.at2plus.messages.GroupNames import RequestGroupNamesMessage, group_names_from_subdata
-from airtouch2.protocol.at2plus.messages.GroupStatus import GroupStatusMessage
+from .airtouch2.at2plus.At2PlusAircon import At2PlusAircon
+from .airtouch2.at2plus.At2PlusGroup import At2PlusGroup
+from .airtouch2.common.NetClient import NetClient
+from .airtouch2.protocol.at2plus.control_status_common import ControlStatusSubHeader, ControlStatusSubType
+from .airtouch2.protocol.at2plus.extended_common import ExtendedMessageSubType, ExtendedSubHeader
+from .airtouch2.protocol.at2plus.message_common import HEADER_LENGTH, HEADER_MAGIC, Header, Message, MessageType
+from .airtouch2.protocol.at2plus.messages.AcAbilityMessage import AcAbility, AcAbilityMessage, RequestAcAbilityMessage
+from .airtouch2.protocol.at2plus.messages.AcStatus import AcStatusMessage
+from .airtouch2.common.Buffer import Buffer
+from .airtouch2.protocol.at2plus.crc16_modbus import crc16
+from .airtouch2.common.interfaces import Callback, Serializable, TaskCreator
+from .airtouch2.protocol.at2plus.messages.GroupNames import RequestGroupNamesMessage, group_names_from_subdata
+from .airtouch2.protocol.at2plus.messages.GroupStatus import GroupStatusMessage
 
 _LOGGER = logging.getLogger(__name__)
 
