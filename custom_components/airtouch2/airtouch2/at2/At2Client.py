@@ -2,13 +2,13 @@ import asyncio
 from datetime import datetime
 import logging
 
-from .airtouch2.common.NetClient import NetClient
-from .airtouch2.protocol.at2.constants import MessageLength
-from .airtouch2.protocol.at2.messages import RequestState, SystemInfo
+from airtouch2.common.NetClient import NetClient
+from airtouch2.protocol.at2.constants import MessageLength
+from airtouch2.protocol.at2.messages import RequestState, SystemInfo
 from typing import Optional
-from .airtouch2.at2.At2Aircon import At2Aircon
-from .airtouch2.at2.At2Group import At2Group
-from .airtouch2.common.interfaces import add_callback, Callback, Serializable, TaskCreator
+from airtouch2.at2.At2Aircon import At2Aircon
+from airtouch2.at2.At2Group import At2Group
+from airtouch2.common.interfaces import add_callback, Callback, Serializable, TaskCreator
 
 _LOGGER = logging.getLogger(__name__)
 
