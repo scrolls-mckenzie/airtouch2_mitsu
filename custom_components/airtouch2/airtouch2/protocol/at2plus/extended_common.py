@@ -1,9 +1,9 @@
 from __future__ import annotations
 from dataclasses import dataclass
 from enum import IntEnum
-from ..common.Buffer import Buffer
+from ....common.Buffer import Buffer
 
-from ..common.interfaces import Serializable
+from ....common.interfaces import Serializable
 
 SUBHEADER_MAGIC = 0xFF
 EXTENDED_SUBHEADER_LENGTH = 2
