@@ -1,13 +1,13 @@
 from __future__ import annotations
 from typing import TYPE_CHECKING
 
-from airtouch2.common.interfaces import Callback
-from airtouch2.protocol.at2plus.enums import GroupPower, GroupSetDamper, GroupSetPower
-from airtouch2.protocol.at2plus.messages.GroupControl import GroupControlMessage, GroupSettings
-from airtouch2.protocol.at2plus.messages.GroupStatus import GroupStatus
+from .airtouch2.common.interfaces import Callback
+from .airtouch2.protocol.at2plus.enums import GroupPower, GroupSetDamper, GroupSetPower
+from .airtouch2.protocol.at2plus.messages.GroupControl import GroupControlMessage, GroupSettings
+from .airtouch2.protocol.at2plus.messages.GroupStatus import GroupStatus
 
 if TYPE_CHECKING:
-    from airtouch2.at2plus.At2PlusClient import At2PlusClient
+    from .airtouch2.at2plus.At2PlusClient import At2PlusClient
 
 
 class At2PlusGroup:
