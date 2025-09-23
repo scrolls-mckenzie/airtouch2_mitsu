@@ -6,7 +6,7 @@ from ..conversions import setpoint_from_value, value_from_setpoint
 from ..control_status_common import CONTROL_STATUS_SUBHEADER_LENGTH, ControlStatusSubType, SubDataLength, ControlStatusSubHeader
 from ..enums import AcFanSpeed, AcSetMode, AcSetPower
 from ..message_common import AddressMsgType, Header, MessageType, add_checksum_message_buffer, prime_message_buffer
-from ......common.interfaces import Serializable
+from ....common.interfaces import Serializable
 
 AC_SETTINGS_LENGTH = 4
 

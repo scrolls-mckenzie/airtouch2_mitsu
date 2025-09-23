@@ -1,8 +1,8 @@
 from __future__ import annotations
 # from dataclasses import dataclass
-from ......common.Buffer import Buffer
+from ....common.Buffer import Buffer
 
-from ......common.interfaces import Serializable
+from ....common.interfaces import Serializable
 from ..constants import Limits
 from ..control_status_common import CONTROL_STATUS_SUBHEADER_LENGTH, ControlStatusSubHeader, ControlStatusSubType, SubDataLength
 from ..enums import GroupSetDamper, GroupSetPower

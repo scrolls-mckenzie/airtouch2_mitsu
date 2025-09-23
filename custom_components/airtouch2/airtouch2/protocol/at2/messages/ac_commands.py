@@ -2,8 +2,8 @@ from ..conversions import val_from_fan_speed
 from ..message_common import add_checksum_message_buffer
 from ..constants import ACCommands, CommandMessageConstants, CommandMessageType, MessageLength
 from ..enums import ACFanSpeed, ACMode
-from ......common.Buffer import Buffer
-from ......common.interfaces import Serializable
+from ....common.Buffer import Buffer
+from ....common.interfaces import Serializable
 
 
 def prime_ac_control_message_buffer(target_ac: int) -> Buffer:

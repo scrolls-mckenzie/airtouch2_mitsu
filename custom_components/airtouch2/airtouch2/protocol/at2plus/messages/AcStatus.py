@@ -5,8 +5,8 @@ from ..conversions import setpoint_from_value, temperature_from_value, value_fro
 from ..control_status_common import CONTROL_STATUS_SUBHEADER_LENGTH, ControlStatusSubType, SubDataLength, ControlStatusSubHeader
 from ..enums import AcFanSpeed, AcMode, AcPower
 from ..message_common import AddressMsgType, Header, MessageType, add_checksum_message_buffer, prime_message_buffer
-from ......common.Buffer import Buffer
-from ......common.interfaces import Serializable
+from ....common.Buffer import Buffer
+from ....common.interfaces import Serializable
 
 AC_STATUS_LENGTH = 10
 
