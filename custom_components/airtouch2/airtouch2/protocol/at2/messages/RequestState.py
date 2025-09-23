@@ -1,7 +1,7 @@
 from ..message_common import add_checksum_message_buffer
 from ..constants import CommandMessageConstants, CommandMessageType, MessageLength
-from ......common.Buffer import Buffer
-from ......common.interfaces import Serializable
+from ....common.Buffer import Buffer
+from ....common.interfaces import Serializable
 
 
 class RequestState(Serializable):

@@ -5,7 +5,7 @@ from enum import IntEnum
 from ..enums import AcFanSpeed, AcSetMode
 from ..extended_common import EXTENDED_SUBHEADER_LENGTH, ExtendedMessageSubType, ExtendedSubHeader
 from ..message_common import AddressMsgType, Header, MessageType, add_checksum_message_buffer, prime_message_buffer
-from ......common.interfaces import Serializable
+from ....common.interfaces import Serializable
 
 
 class AcAbilitySubDataLength(IntEnum):

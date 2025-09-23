@@ -1,7 +1,7 @@
 from ..constants import CommandMessageConstants, CommandMessageType, GroupCommands, MessageLength
 from ..message_common import add_checksum_message_buffer
-from ......common.Buffer import Buffer
-from ......common.interfaces import Serializable
+from ....common.Buffer import Buffer
+from ....common.interfaces import Serializable
 
 
 def prime_group_control_message_buffer(target_group: int) -> Buffer:

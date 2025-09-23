@@ -3,9 +3,9 @@ from dataclasses import dataclass
 from enum import IntEnum
 import logging
 
-from ....common.Buffer import Buffer
+from ...common.Buffer import Buffer
 from .crc16_modbus import crc16
-from ....common.interfaces import Serializable
+from ...common.interfaces import Serializable
 
 # Message ID can be whatever
 MESSAGE_ID = 1

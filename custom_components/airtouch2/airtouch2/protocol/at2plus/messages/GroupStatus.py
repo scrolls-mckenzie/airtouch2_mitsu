@@ -1,10 +1,10 @@
 from __future__ import annotations
 from dataclasses import dataclass
 
-from ......common.interfaces import Serializable
+from ....common.interfaces import Serializable
 from ..control_status_common import CONTROL_STATUS_SUBHEADER_LENGTH, ControlStatusSubHeader, ControlStatusSubType, SubDataLength
 from ..enums import GroupPower
-from ......common.Buffer import Buffer
+from ....common.Buffer import Buffer
 from ..message_common import AddressMsgType, Header, MessageType, add_checksum_message_buffer, prime_message_buffer
 
 GROUP_STATUS_LENGTH = 8
