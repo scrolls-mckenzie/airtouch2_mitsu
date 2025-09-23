@@ -2,12 +2,12 @@ from __future__ import annotations
 import asyncio
 import logging
 from typing import TYPE_CHECKING, Callable
-from .airtouch2.common.interfaces import Publisher, Callback, add_callback
+from airtouch2.common.interfaces import Publisher, Callback, add_callback
 if TYPE_CHECKING:
-    from .airtouch2.at2.At2Client import At2Client
-from .airtouch2.protocol.at2.enums import ACFanSpeed, ACBrand, ACMode
-from .airtouch2.protocol.at2.messages import ChangeSetTemperature, SetFanSpeed, SetMode, ToggleAc
-from .airtouch2.protocol.at2.messages.SystemInfo import AcInfo
+    from airtouch2.at2.At2Client import At2Client
+from airtouch2.protocol.at2.enums import ACFanSpeed, ACBrand, ACMode
+from airtouch2.protocol.at2.messages import ChangeSetTemperature, SetFanSpeed, SetMode, ToggleAc
+from airtouch2.protocol.at2.messages.SystemInfo import AcInfo
 
 _LOGGER = logging.getLogger(__name__)
 

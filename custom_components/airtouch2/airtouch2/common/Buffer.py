@@ -1,5 +1,5 @@
 from __future__ import annotations
-from .airtouch2.common.interfaces import Serializable
+from airtouch2.common.interfaces import Serializable
 
 
 class Buffer(Serializable):
