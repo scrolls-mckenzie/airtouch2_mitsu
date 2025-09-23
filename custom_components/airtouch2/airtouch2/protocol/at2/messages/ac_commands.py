@@ -1,7 +1,7 @@
-from ......protocol.at2.conversions import val_from_fan_speed
-from ......protocol.at2.message_common import add_checksum_message_buffer
-from ......protocol.at2.constants import ACCommands, CommandMessageConstants, CommandMessageType, MessageLength
-from ......protocol.at2.enums import ACFanSpeed, ACMode
+from ..conversions import val_from_fan_speed
+from ..message_common import add_checksum_message_buffer
+from ..constants import ACCommands, CommandMessageConstants, CommandMessageType, MessageLength
+from ..enums import ACFanSpeed, ACMode
 from ......common.Buffer import Buffer
 from ......common.interfaces import Serializable
 
