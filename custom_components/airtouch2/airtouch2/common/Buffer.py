@@ -1,5 +1,5 @@
 from __future__ import annotations
-from ..common.interfaces import Serializable
+from .interfaces import Serializable
 
 
 class Buffer(Serializable):
