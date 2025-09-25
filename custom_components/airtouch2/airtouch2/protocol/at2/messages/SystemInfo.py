@@ -16,7 +16,15 @@ _LOGGER = logging.getLogger(__name__)
 def _resolve_brand(gateway_id: int, reported_brand: int) -> ACBrand:
     # Brand based on gateway ID takes priority according to app smali
     gateway_based_brand = brand_from_gateway_id(gateway_id)
-    return gateway_based_brand if gateway_based_brand is not None else ACBrand(reported_brand)
+    if gateway_based_brand is not None:
+        return gateway_based_brand
+    
+    # Handle unknown brand values gracefully
+    try:
+        return ACBrand(reported_brand)
+    except ValueError:
+        _LOGGER.warning(f"AC reported unknown brand value {reported_brand}, using NONE as fallback. " + OPEN_ISSUE_TEXT)
+        return ACBrand.NONE
 
 
 def _parse_name(name: bytes) -> str:

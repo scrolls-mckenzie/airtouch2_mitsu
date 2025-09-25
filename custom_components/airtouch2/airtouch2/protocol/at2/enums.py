@@ -40,6 +40,8 @@ class ACBrand(IntEnum):
     PANASONIC = 7
     SAMSUNG = 8
     TOSHIBA = 9
+    # Unknown brand value encountered in the field
+    UNKNOWN_168 = 168
 
     def __str__(self):
         return self._name_
