@@ -34,6 +34,8 @@ class AirTouch2ConnectionMonitor:
         self._monitor_task = None
         self._check_interval = timedelta(seconds=30)  # Check every 30 seconds
         self._timeout_threshold = timedelta(minutes=2)  # Consider dead after 2 minutes
+        self._original_handle_message = None
+        self._status_request_count = 0
         
     def update_last_seen(self) -> None:
         """Update the last seen timestamp."""
@@ -46,6 +48,9 @@ class AirTouch2ConnectionMonitor:
             
         _LOGGER.debug("Starting AirTouch2 connection monitoring")
         self._monitoring = True
+        
+        # Hook into client's message handling to track updates
+        self._hook_client_updates()
         
         # Schedule periodic checks
         try:
@@ -66,6 +71,9 @@ class AirTouch2ConnectionMonitor:
         _LOGGER.debug("Stopping AirTouch2 connection monitoring")
         self._monitoring = False
         
+        # Restore original client message handling
+        self._unhook_client_updates()
+        
         if self._monitor_task:
             self._monitor_task()
             self._monitor_task = None
@@ -82,10 +90,27 @@ class AirTouch2ConnectionMonitor:
             
             time_since_update = current_time - last_update
             
-            if time_since_update > self._timeout_threshold:
+            # If we haven't received updates for 1 minute, send a status request
+            if time_since_update > timedelta(minutes=1):
+                if self._status_request_count < 3:  # Try up to 3 status requests
+                    _LOGGER.debug("No updates for %s, requesting status (attempt %d)", 
+                                time_since_update, self._status_request_count + 1)
+                    try:
+                        from .airtouch2.protocol.at2.messages.RequestState import RequestState
+                        await self.client.send(RequestState())
+                        self._status_request_count += 1
+                    except Exception as err:
+                        _LOGGER.debug("Failed to send status request: %s", err)
+                        self._status_request_count += 1
+            else:
+                # Reset counter when we get updates
+                self._status_request_count = 0
+            
+            # If still no updates after 3 minutes or 3 failed status requests, attempt reconnection
+            if time_since_update > timedelta(minutes=3) or self._status_request_count >= 3:
                 _LOGGER.warning(
-                    "AirTouch2 connection appears dead (no updates for %s), attempting reconnection",
-                    time_since_update
+                    "AirTouch2 connection appears dead (no updates for %s, %d status requests sent), attempting reconnection",
+                    time_since_update, self._status_request_count
                 )
                 await self._reconnect()
         except Exception as err:
@@ -113,6 +138,7 @@ class AirTouch2ConnectionMonitor:
                 self.client.run()
                 await self.client.wait_for_ac(timeout=10)
                 self.update_last_seen()
+                self._status_request_count = 0  # Reset counter after successful reconnection
                 
                 # Notify entities about reconnection
                 if self.reconnect_callback:
@@ -166,3 +192,26 @@ class AirTouch2ConnectionMonitor:
                         
         except Exception as err:
             _LOGGER.debug("Error forcing entity updates: %s", err)
+    
+    def _hook_client_updates(self) -> None:
+        """Hook into client's message handling to track updates."""
+        if hasattr(self.client, '_handle_one_message'):
+            self._original_handle_message = self.client._handle_one_message
+            
+            async def monitored_handle_message():
+                """Wrapper that updates last seen timestamp."""
+                try:
+                    result = await self._original_handle_message()
+                    self.update_last_seen()
+                    return result
+                except Exception as err:
+                    _LOGGER.debug("Error in message handling: %s", err)
+                    raise
+            
+            self.client._handle_one_message = monitored_handle_message
+    
+    def _unhook_client_updates(self) -> None:
+        """Restore original client message handling."""
+        if self._original_handle_message and hasattr(self.client, '_handle_one_message'):
+            self.client._handle_one_message = self._original_handle_message
+            self._original_handle_message = None
