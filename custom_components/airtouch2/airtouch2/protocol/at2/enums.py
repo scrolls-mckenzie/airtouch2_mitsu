@@ -7,9 +7,8 @@ class ACMode(IntEnum):
     DRY = 2
     FAN = 3
     COOL = 4
-    # Only keep the documented Mitsubishi modes that are actually used
-    MITSUBISHI_MODE_130 = 130  # Documented Mitsubishi mode - maps to HEAT
-    MITSUBISHI_MODE_223 = 223  # Documented Mitsubishi mode - maps to AUTO
+    # Mitsubishi Electric specific modes
+    MITSUBISHI_MODE_130 = 130  # Unknown Mitsubishi mode - maps to HEAT for now
 
     def __str__(self):
         return self._name_
@@ -40,8 +39,6 @@ class ACBrand(IntEnum):
     PANASONIC = 7
     SAMSUNG = 8
     TOSHIBA = 9
-    # Unknown brand value encountered in the field
-    UNKNOWN_168 = 168
 
     def __str__(self):
         return self._name_
