@@ -6,9 +6,9 @@ from itertools import compress
 from pprint import pformat
 from typing import Optional
 
-from ..constants import OPEN_ISSUE_TEXT, MessageLength, ResponseMessageConstants, ResponseMessageOffsets
-from ..conversions import brand_from_gateway_id, fan_speed_from_val
-from ..enums import ACBrand, ACFanSpeed, ACMode
+from airtouch2.protocol.at2.constants import OPEN_ISSUE_TEXT, MessageLength, ResponseMessageConstants, ResponseMessageOffsets
+from airtouch2.protocol.at2.conversions import brand_from_gateway_id, fan_speed_from_val
+from airtouch2.protocol.at2.enums import ACBrand, ACFanSpeed, ACMode
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -29,7 +29,19 @@ def _resolve_brand(gateway_id: int, reported_brand: int) -> ACBrand:
 
 def _parse_name(name: bytes) -> str:
     # There's probably a better way of doing this.
-    return name.decode().split()[0].split("\0")[0]
+    try:
+        return name.decode('utf-8').split()[0].split("\0")[0]
+    except UnicodeDecodeError:
+        # Fallback to latin-1 which can decode any byte sequence
+        try:
+            decoded = name.decode('latin-1').split()[0].split("\0")[0]
+            _LOGGER.debug(f"Used latin-1 fallback for name decoding: {decoded}")
+            return decoded
+        except Exception:
+            # Last resort: replace invalid characters
+            decoded = name.decode('utf-8', errors='replace').split()[0].split("\0")[0]
+            _LOGGER.warning(f"Used error replacement for name decoding: {decoded}")
+            return decoded
 
 # TODO: read through app smali code more and do this more properly
 # Currently I'm assuming:
@@ -279,8 +291,9 @@ class SystemInfo:
         # System-wide
 
         touchpad_temp = raw_response[ResponseMessageOffsets.TOUCHPAD_TEMP]
-        system_name = raw_response[ResponseMessageOffsets.SYSTEM_NAME: ResponseMessageOffsets.SYSTEM_NAME +
-                                   ResponseMessageConstants.LONG_STRING_LENGTH].decode().split("\0")[0]
+        system_name_bytes = raw_response[ResponseMessageOffsets.SYSTEM_NAME: ResponseMessageOffsets.SYSTEM_NAME +
+                                        ResponseMessageConstants.LONG_STRING_LENGTH]
+        system_name = _parse_name(system_name_bytes)
 
         return SystemInfo(aircons_by_id, groups_by_id, touchpad_temp, system_name)
 
