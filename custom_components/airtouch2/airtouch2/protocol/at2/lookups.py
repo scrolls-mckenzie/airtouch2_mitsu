@@ -30,5 +30,6 @@ GATEWAYID_BRAND_LOOKUP = {
     0x22 : ACBrand.FUJITSU,
     0xF  : ACBrand.MITSUBISHI_ELECTRIC,
     0x12  : ACBrand.SAMSUNG,
+    0xa0 : ACBrand.MITSUBISHI_ELECTRIC,  # Another Mitsubishi gateway ID
     0xc7 : ACBrand.UNKNOWN_168  # Unknown brand with gateway ID 0xc7
 }

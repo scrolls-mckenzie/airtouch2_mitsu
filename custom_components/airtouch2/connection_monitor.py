@@ -126,29 +126,49 @@ class AirTouch2ConnectionMonitor:
         try:
             _LOGGER.info("Attempting to reconnect to AirTouch2 at %s", self.host)
             
-            # Stop the current client
+            # Stop the current client and unhook monitoring
+            self._unhook_client_updates()
             await self.client.stop()
             
-            # Wait a bit before reconnecting
-            await asyncio.sleep(2)
+            # Wait longer before reconnecting to allow network recovery
+            await asyncio.sleep(5)
             
-            # Try to reconnect
-            if await self.client.connect():
-                _LOGGER.info("Successfully reconnected to AirTouch2")
-                self.client.run()
-                await self.client.wait_for_ac(timeout=10)
-                self.update_last_seen()
-                self._status_request_count = 0  # Reset counter after successful reconnection
-                
-                # Notify entities about reconnection
-                if self.reconnect_callback:
-                    self.reconnect_callback()
-                
-                # Force update all entities
-                await self._force_entity_updates()
+            # Try to reconnect with retries
+            max_retries = 3
+            for attempt in range(max_retries):
+                try:
+                    _LOGGER.debug(f"Reconnection attempt {attempt + 1}/{max_retries}")
                     
-            else:
-                _LOGGER.error("Failed to reconnect to AirTouch2, will retry later")
+                    if await self.client.connect():
+                        _LOGGER.info("Successfully reconnected to AirTouch2")
+                        
+                        # Re-hook monitoring before starting client
+                        self._hook_client_updates()
+                        
+                        self.client.run()
+                        await self.client.wait_for_ac(timeout=15)  # Longer timeout
+                        self.update_last_seen()
+                        self._status_request_count = 0  # Reset counter after successful reconnection
+                        
+                        # Notify entities about reconnection
+                        if self.reconnect_callback:
+                            self.reconnect_callback()
+                        
+                        # Force update all entities
+                        await self._force_entity_updates()
+                        return  # Success, exit retry loop
+                        
+                    else:
+                        _LOGGER.warning(f"Reconnection attempt {attempt + 1} failed")
+                        if attempt < max_retries - 1:
+                            await asyncio.sleep(2 * (attempt + 1))  # Exponential backoff
+                            
+                except Exception as retry_err:
+                    _LOGGER.warning(f"Reconnection attempt {attempt + 1} error: %s", retry_err)
+                    if attempt < max_retries - 1:
+                        await asyncio.sleep(2 * (attempt + 1))  # Exponential backoff
+            
+            _LOGGER.error("All reconnection attempts failed, will retry later")
                 
         except Exception as err:
             _LOGGER.error("Error during AirTouch2 reconnection: %s", err)
