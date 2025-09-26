@@ -1,10 +1,10 @@
 from __future__ import annotations
 from dataclasses import dataclass
 from enum import IntEnum
-from ...common.Buffer import Buffer
+from airtouch2.common.Buffer import Buffer
 import logging
 
-from ...common.interfaces import Serializable
+from airtouch2.common.interfaces import Serializable
 
 
 CONTROL_STATUS_SUBHEADER_LENGTH = 8

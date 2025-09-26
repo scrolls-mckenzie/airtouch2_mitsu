@@ -1,4 +1,4 @@
-from .enums import ACBrand
+from airtouch2.protocol.at2.enums import ACBrand
 
 # I cannot find documentation of what these values actually mean
 # The app prioritises this 'brand' (based on gateway id) over the other one in the message
@@ -30,6 +30,7 @@ GATEWAYID_BRAND_LOOKUP = {
     0x22 : ACBrand.FUJITSU,
     0xF  : ACBrand.MITSUBISHI_ELECTRIC,
     0x12  : ACBrand.SAMSUNG,
+    0x66 : ACBrand.UNKNOWN_168,  # Unknown brand with gateway ID 0x66
     0xa0 : ACBrand.MITSUBISHI_ELECTRIC,  # Another Mitsubishi gateway ID
     0xc7 : ACBrand.UNKNOWN_168  # Unknown brand with gateway ID 0xc7
 }

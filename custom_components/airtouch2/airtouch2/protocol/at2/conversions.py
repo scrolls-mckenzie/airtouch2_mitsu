@@ -1,9 +1,9 @@
 
 import logging
-from .constants import OPEN_ISSUE_TEXT
+from airtouch2.protocol.at2.constants import OPEN_ISSUE_TEXT
 from typing import Optional
-from .enums import ACBrand, ACFanSpeed
-from .lookups import GATEWAYID_BRAND_LOOKUP
+from airtouch2.protocol.at2.enums import ACBrand, ACFanSpeed
+from airtouch2.protocol.at2.lookups import GATEWAYID_BRAND_LOOKUP
 
 _LOGGER = logging.getLogger(__name__)
 
