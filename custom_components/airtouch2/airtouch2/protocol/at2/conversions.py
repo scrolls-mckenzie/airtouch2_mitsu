@@ -13,13 +13,7 @@ def fan_speed_from_val(supported_speeds: list[ACFanSpeed], speed_val: int) -> AC
         # Units with no Auto speed still start with low == 1
         if ACFanSpeed.AUTO not in supported_speeds:
             speed_val -= 1
-        
-        # Ensure we don't go out of bounds
-        if 0 <= speed_val < len(supported_speeds):
-            return supported_speeds[speed_val]
-        else:
-            _LOGGER.warning(f"Fan speed value {speed_val} out of bounds for supported speeds {supported_speeds}, defaulting to first available speed")
-            return supported_speeds[0] if supported_speeds else ACFanSpeed.AUTO
+        return supported_speeds[speed_val]
     else:
         return ACFanSpeed.AUTO
 

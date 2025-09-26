@@ -16,32 +16,12 @@ _LOGGER = logging.getLogger(__name__)
 def _resolve_brand(gateway_id: int, reported_brand: int) -> ACBrand:
     # Brand based on gateway ID takes priority according to app smali
     gateway_based_brand = brand_from_gateway_id(gateway_id)
-    if gateway_based_brand is not None:
-        return gateway_based_brand
-    
-    # Handle unknown brand values gracefully
-    try:
-        return ACBrand(reported_brand)
-    except ValueError:
-        _LOGGER.warning(f"AC reported unknown brand value {reported_brand}, using NONE as fallback. " + OPEN_ISSUE_TEXT)
-        return ACBrand.NONE
+    return gateway_based_brand if gateway_based_brand is not None else ACBrand(reported_brand)
 
 
 def _parse_name(name: bytes) -> str:
     # There's probably a better way of doing this.
-    try:
-        return name.decode('utf-8').split()[0].split("\0")[0]
-    except UnicodeDecodeError:
-        # Fallback to latin-1 which can decode any byte sequence
-        try:
-            decoded = name.decode('latin-1').split()[0].split("\0")[0]
-            _LOGGER.debug(f"Used latin-1 fallback for name decoding: {decoded}")
-            return decoded
-        except Exception:
-            # Last resort: replace invalid characters
-            decoded = name.decode('utf-8', errors='replace').split()[0].split("\0")[0]
-            _LOGGER.warning(f"Used error replacement for name decoding: {decoded}")
-            return decoded
+    return name.decode().split()[0].split("\0")[0]
 
 # TODO: read through app smali code more and do this more properly
 # Currently I'm assuming:
@@ -153,9 +133,6 @@ class AcInfo:
             if ac_mode == 130:
                 _LOGGER.debug(f"AC {ac_number} using Mitsubishi mode 130, mapping to HEAT")
                 mode = ACMode.MITSUBISHI_MODE_130
-            elif ac_mode == 223:
-                _LOGGER.debug(f"AC {ac_number} using Mitsubishi mode 223, mapping to AUTO")
-                mode = ACMode.MITSUBISHI_MODE_223
             else:
                 _LOGGER.warning(f"AC {ac_number} reported unknown mode value {ac_mode}, defaulting to AUTO. " + OPEN_ISSUE_TEXT)
                 mode = ACMode.AUTO
@@ -291,9 +268,8 @@ class SystemInfo:
         # System-wide
 
         touchpad_temp = raw_response[ResponseMessageOffsets.TOUCHPAD_TEMP]
-        system_name_bytes = raw_response[ResponseMessageOffsets.SYSTEM_NAME: ResponseMessageOffsets.SYSTEM_NAME +
-                                        ResponseMessageConstants.LONG_STRING_LENGTH]
-        system_name = _parse_name(system_name_bytes)
+        system_name = raw_response[ResponseMessageOffsets.SYSTEM_NAME: ResponseMessageOffsets.SYSTEM_NAME +
+                                   ResponseMessageConstants.LONG_STRING_LENGTH].decode().split("\0")[0]
 
         return SystemInfo(aircons_by_id, groups_by_id, touchpad_temp, system_name)
 
