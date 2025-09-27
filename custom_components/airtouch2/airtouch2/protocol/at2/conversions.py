@@ -36,8 +36,10 @@ def brand_from_gateway_id(gateway_id: int) -> Optional[ACBrand]:
                            f"If AC control doesn't work properly, please report this gateway ID.")
             return brand
         else:
-            _LOGGER.warning(
-                f"Encountered unknown gateway ID: {hex(gateway_id)} ({gateway_id} decimal). "
-                f"System will attempt to use fallback brand detection. "
-                f"Please report this gateway ID with your AC brand/model - " + OPEN_ISSUE_TEXT)
+            # For ANY unknown gateway ID, use MITSUBISHI_ELECTRIC as safe default
+            # This prevents system crashes and unresponsiveness
+            _LOGGER.info(
+                f"Unknown gateway ID {hex(gateway_id)} ({gateway_id} decimal) - using MITSUBISHI_ELECTRIC as safe default. "
+                f"If AC control doesn't work properly, please report this gateway ID with your AC brand/model - " + OPEN_ISSUE_TEXT)
+            return ACBrand.MITSUBISHI_ELECTRIC
     return None
