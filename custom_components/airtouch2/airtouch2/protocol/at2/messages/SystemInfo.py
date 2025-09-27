@@ -16,7 +16,15 @@ _LOGGER = logging.getLogger(__name__)
 def _resolve_brand(gateway_id: int, reported_brand: int) -> ACBrand:
     # Brand based on gateway ID takes priority according to app smali
     gateway_based_brand = brand_from_gateway_id(gateway_id)
-    return gateway_based_brand if gateway_based_brand is not None else ACBrand(reported_brand)
+    if gateway_based_brand is not None:
+        return gateway_based_brand
+    
+    # Fallback to reported brand, with safety check
+    try:
+        return ACBrand(reported_brand)
+    except ValueError:
+        _LOGGER.warning(f"Invalid reported brand {reported_brand} for gateway ID {hex(gateway_id)}. Using MITSUBISHI_ELECTRIC as fallback.")
+        return ACBrand.MITSUBISHI_ELECTRIC
 
 
 def _parse_name(name: bytes) -> str:

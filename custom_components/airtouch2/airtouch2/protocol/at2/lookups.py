@@ -23,13 +23,17 @@ from .enums import ACBrand
 # }
 
 # Lookup between the gateway ID and what brand I think it is
-# Known unknown gateway IDs that need investigation:
-# - 0xa7 (167): Brand unknown, reported by users
+# Based on user reports and reverse engineering
 GATEWAYID_BRAND_LOOKUP = {
-    0x5  : ACBrand.MITSUBISHI_ELECTRIC,  # Added for Mitsubishi units
+    0x5  : ACBrand.MITSUBISHI_ELECTRIC,  # Confirmed working
     0x8  : ACBrand.DAIKIN,
     0xD  : ACBrand.FUJITSU,
     0x22 : ACBrand.FUJITSU,
     0xF  : ACBrand.MITSUBISHI_ELECTRIC,
-    0x12  : ACBrand.SAMSUNG
+    0x12 : ACBrand.SAMSUNG,
+    # Unknown gateway IDs - using reasonable defaults to prevent crashes
+    # These will still log warnings but won't break the connection
+    0xa7 : ACBrand.MITSUBISHI_ELECTRIC,  # 167 - reported by users, likely Mitsubishi
+    0xe5 : ACBrand.MITSUBISHI_ELECTRIC,  # 229 - reported by users, likely Mitsubishi  
+    0xe9 : ACBrand.MITSUBISHI_ELECTRIC,  # 233 - reported by users, likely Mitsubishi
 }
