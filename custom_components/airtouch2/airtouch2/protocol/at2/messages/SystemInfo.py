@@ -23,7 +23,8 @@ def _resolve_brand(gateway_id: int, reported_brand: int) -> ACBrand:
     try:
         return ACBrand(reported_brand)
     except ValueError:
-        _LOGGER.warning(f"Invalid reported brand {reported_brand} for gateway ID {hex(gateway_id)}. Using MITSUBISHI_ELECTRIC as fallback.")
+        # Don't log this as warning since we already logged in brand_from_gateway_id
+        # Just use safe fallback silently
         return ACBrand.MITSUBISHI_ELECTRIC
 
 
@@ -214,85 +215,101 @@ class SystemInfo:
     def from_bytes(raw_response: bytes) -> SystemInfo:
         assert len(raw_response) == MessageLength.RESPONSE, f"Response message must be {MessageLength.RESPONSE} bytes"
 
-        # ACs
-
+        # ACs - wrap in try/catch to prevent unresponsiveness
         aircons_by_id: dict[int, AcInfo] = {}
-        for ac_id in range(2):
-            name_start = ResponseMessageOffsets.AC_NAME_START + ac_id * ResponseMessageConstants.SHORT_STRING_LENGTH
-            name_end = name_start + ResponseMessageConstants.SHORT_STRING_LENGTH
+        try:
+            for ac_id in range(2):
+                try:
+                    name_start = ResponseMessageOffsets.AC_NAME_START + ac_id * ResponseMessageConstants.SHORT_STRING_LENGTH
+                    name_end = name_start + ResponseMessageConstants.SHORT_STRING_LENGTH
 
-            ac_info = AcInfo.parse(ac_id,
-                                   raw_response[ResponseMessageOffsets.AC_STATUS_START + ac_id],
-                                   raw_response[ResponseMessageOffsets.AC_ERROR_CODE_START + ac_id],
-                                   raw_response[ResponseMessageOffsets.ACs_STATUS + ac_id],
-                                   raw_response[ResponseMessageOffsets.AC_MODE_START + ac_id],
-                                   raw_response[ResponseMessageOffsets.AC_FAN_SPEED_START + ac_id],
-                                   raw_response[ResponseMessageOffsets.AC_SET_TEMP_START + ac_id],
-                                   raw_response[ResponseMessageOffsets.AC_MEASURED_TEMP_START + ac_id],
-                                   raw_response[ResponseMessageOffsets.AC_BRAND_START + ac_id],
-                                   raw_response[ResponseMessageOffsets.AC_GATEWAY_ID_START + ac_id],
-                                   raw_response[name_start:name_end])
-            if ac_info is not None:
-                aircons_by_id[ac_id] = ac_info
+                    ac_info = AcInfo.parse(ac_id,
+                                           raw_response[ResponseMessageOffsets.AC_STATUS_START + ac_id],
+                                           raw_response[ResponseMessageOffsets.AC_ERROR_CODE_START + ac_id],
+                                           raw_response[ResponseMessageOffsets.ACs_STATUS + ac_id],
+                                           raw_response[ResponseMessageOffsets.AC_MODE_START + ac_id],
+                                           raw_response[ResponseMessageOffsets.AC_FAN_SPEED_START + ac_id],
+                                           raw_response[ResponseMessageOffsets.AC_SET_TEMP_START + ac_id],
+                                           raw_response[ResponseMessageOffsets.AC_MEASURED_TEMP_START + ac_id],
+                                           raw_response[ResponseMessageOffsets.AC_BRAND_START + ac_id],
+                                           raw_response[ResponseMessageOffsets.AC_GATEWAY_ID_START + ac_id],
+                                           raw_response[name_start:name_end])
+                    if ac_info is not None:
+                        aircons_by_id[ac_id] = ac_info
+                except Exception as e:
+                    _LOGGER.error(f"Error parsing AC {ac_id}: {e}. Skipping this AC to prevent system hang.")
+                    continue
+        except Exception as e:
+            _LOGGER.error(f"Critical error parsing ACs: {e}. Continuing with empty AC list.")
 
-        # Groups
+        # Groups - wrap in try/catch to prevent unresponsiveness
         # TODO: Factor out into an analogous 'GroupInfo.parse()'
-
-        num_groups = raw_response[ResponseMessageOffsets.NUM_GROUPS]
-        turbo_group = raw_response[ResponseMessageOffsets.TURBO_GROUP]
         groups_by_id: dict[int, GroupInfo] = {}
+        try:
+            num_groups = raw_response[ResponseMessageOffsets.NUM_GROUPS]
+            turbo_group = raw_response[ResponseMessageOffsets.TURBO_GROUP]
 
-        for group_id in range(min(num_groups, 16)):  # Safety limit to prevent runaway loops
-            name_start = ResponseMessageOffsets.GROUP_NAMES_START + group_id * ResponseMessageConstants.SHORT_STRING_LENGTH
-            name_end = name_start + ResponseMessageConstants.SHORT_STRING_LENGTH
-            name = _parse_name(raw_response[name_start:name_end])
+            for group_id in range(min(num_groups, 16)):  # Safety limit to prevent runaway loops
+                try:
+                    name_start = ResponseMessageOffsets.GROUP_NAMES_START + group_id * ResponseMessageConstants.SHORT_STRING_LENGTH
+                    name_end = name_start + ResponseMessageConstants.SHORT_STRING_LENGTH
+                    name = _parse_name(raw_response[name_start:name_end])
 
-            group_zones = raw_response[ResponseMessageOffsets.GROUP_ZONES_START + group_id]
-            start_zone = (group_zones & 0xF0) >> 4
-            num_zones = group_zones & 0x0F
-            
-            # Safety checks to prevent array bounds issues
-            if start_zone >= len(raw_response) or num_zones > 16:
-                _LOGGER.warning(f"Group {group_id} has invalid zone configuration: start_zone={start_zone}, num_zones={num_zones}")
-                continue
-                
-            zone_info = ZoneInfo.parse(raw_response[ResponseMessageOffsets.ZONE_DAMPS_START + start_zone],
-                                       raw_response[ResponseMessageOffsets.ZONE_STATUSES_START + start_zone])
-            active = zone_info.active
-            spill = zone_info.spill
-            damp = zone_info.damp
-
-            mismatches: set[str] = set()
-            for zone_number in range(start_zone+1, min(start_zone + num_zones, len(raw_response))):
-                # Additional bounds check
-                if (ResponseMessageOffsets.ZONE_DAMPS_START + zone_number >= len(raw_response) or
-                    ResponseMessageOffsets.ZONE_STATUSES_START + zone_number >= len(raw_response)):
-                    _LOGGER.warning(f"Zone {zone_number} access would exceed message bounds")
-                    break
+                    group_zones = raw_response[ResponseMessageOffsets.GROUP_ZONES_START + group_id]
+                    start_zone = (group_zones & 0xF0) >> 4
+                    num_zones = group_zones & 0x0F
                     
-                zone_info = ZoneInfo.parse(raw_response[ResponseMessageOffsets.ZONE_DAMPS_START + zone_number],
-                                           raw_response[ResponseMessageOffsets.ZONE_STATUSES_START + zone_number])
-                # this group is spilling if any of its zones are
-                if not spill:
+                    # Safety checks to prevent array bounds issues
+                    if start_zone >= len(raw_response) or num_zones > 16:
+                        _LOGGER.warning(f"Group {group_id} has invalid zone configuration: start_zone={start_zone}, num_zones={num_zones}")
+                        continue
+                        
+                    zone_info = ZoneInfo.parse(raw_response[ResponseMessageOffsets.ZONE_DAMPS_START + start_zone],
+                                               raw_response[ResponseMessageOffsets.ZONE_STATUSES_START + start_zone])
+                    active = zone_info.active
                     spill = zone_info.spill
-                # these should match for all zones that comprise this group
-                if (damp != zone_info.damp):
-                    mismatches.add("damper percents")
-                if (active != zone_info.active):
-                    mismatches.add("on/off states")
-                    
-            if mismatches:
-                _LOGGER.warning(f"Zones of group '{name}' have mismatching {', '.join(mismatches)}")
+                    damp = zone_info.damp
 
-            turbo = True if turbo_group == group_id else False
+                    mismatches: set[str] = set()
+                    for zone_number in range(start_zone+1, min(start_zone + num_zones, len(raw_response))):
+                        # Additional bounds check
+                        if (ResponseMessageOffsets.ZONE_DAMPS_START + zone_number >= len(raw_response) or
+                            ResponseMessageOffsets.ZONE_STATUSES_START + zone_number >= len(raw_response)):
+                            _LOGGER.warning(f"Zone {zone_number} access would exceed message bounds")
+                            break
+                            
+                        zone_info = ZoneInfo.parse(raw_response[ResponseMessageOffsets.ZONE_DAMPS_START + zone_number],
+                                                   raw_response[ResponseMessageOffsets.ZONE_STATUSES_START + zone_number])
+                        # this group is spilling if any of its zones are
+                        if not spill:
+                            spill = zone_info.spill
+                        # these should match for all zones that comprise this group
+                        if (damp != zone_info.damp):
+                            mismatches.add("damper percents")
+                        if (active != zone_info.active):
+                            mismatches.add("on/off states")
+                            
+                    if mismatches:
+                        _LOGGER.warning(f"Zones of group '{name}' have mismatching {', '.join(mismatches)}")
 
-            groups_by_id[group_id] = GroupInfo(name, group_id, active, damp, spill, turbo)
+                    turbo = True if turbo_group == group_id else False
 
-        # System-wide
+                    groups_by_id[group_id] = GroupInfo(name, group_id, active, damp, spill, turbo)
+                except Exception as e:
+                    _LOGGER.error(f"Error parsing group {group_id}: {e}. Skipping this group to prevent system hang.")
+                    continue
+        except Exception as e:
+            _LOGGER.error(f"Critical error parsing groups: {e}. Continuing with empty group list.")
 
-        touchpad_temp = raw_response[ResponseMessageOffsets.TOUCHPAD_TEMP]
-        system_name = raw_response[ResponseMessageOffsets.SYSTEM_NAME: ResponseMessageOffsets.SYSTEM_NAME +
-                                   ResponseMessageConstants.LONG_STRING_LENGTH].decode().split("\0")[0]
+        # System-wide - with error handling
+        touchpad_temp = 0
+        system_name = "Unknown"
+        try:
+            touchpad_temp = raw_response[ResponseMessageOffsets.TOUCHPAD_TEMP]
+            system_name = raw_response[ResponseMessageOffsets.SYSTEM_NAME: ResponseMessageOffsets.SYSTEM_NAME +
+                                       ResponseMessageConstants.LONG_STRING_LENGTH].decode().split("\0")[0]
+        except Exception as e:
+            _LOGGER.error(f"Error parsing system info: {e}. Using defaults.")
 
         return SystemInfo(aircons_by_id, groups_by_id, touchpad_temp, system_name)
 
