@@ -34,6 +34,7 @@ GATEWAYID_BRAND_LOOKUP = {
     # Unknown gateway IDs - using reasonable defaults to prevent crashes
     # These will still log warnings but won't break the connection
     0xa7 : ACBrand.MITSUBISHI_ELECTRIC,  # 167 - reported by users, likely Mitsubishi
+    0xd3 : ACBrand.MITSUBISHI_ELECTRIC,  # 211 - reported by users, likely Mitsubishi
     0xe5 : ACBrand.MITSUBISHI_ELECTRIC,  # 229 - reported by users, likely Mitsubishi  
     0xe9 : ACBrand.MITSUBISHI_ELECTRIC,  # 233 - reported by users, likely Mitsubishi
 }

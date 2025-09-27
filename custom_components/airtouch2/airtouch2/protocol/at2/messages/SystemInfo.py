@@ -242,7 +242,7 @@ class SystemInfo:
         turbo_group = raw_response[ResponseMessageOffsets.TURBO_GROUP]
         groups_by_id: dict[int, GroupInfo] = {}
 
-        for group_id in range(num_groups):
+        for group_id in range(min(num_groups, 16)):  # Safety limit to prevent runaway loops
             name_start = ResponseMessageOffsets.GROUP_NAMES_START + group_id * ResponseMessageConstants.SHORT_STRING_LENGTH
             name_end = name_start + ResponseMessageConstants.SHORT_STRING_LENGTH
             name = _parse_name(raw_response[name_start:name_end])
@@ -251,6 +251,11 @@ class SystemInfo:
             start_zone = (group_zones & 0xF0) >> 4
             num_zones = group_zones & 0x0F
             
+            # Safety checks to prevent array bounds issues
+            if start_zone >= len(raw_response) or num_zones > 16:
+                _LOGGER.warning(f"Group {group_id} has invalid zone configuration: start_zone={start_zone}, num_zones={num_zones}")
+                continue
+                
             zone_info = ZoneInfo.parse(raw_response[ResponseMessageOffsets.ZONE_DAMPS_START + start_zone],
                                        raw_response[ResponseMessageOffsets.ZONE_STATUSES_START + start_zone])
             active = zone_info.active
@@ -258,7 +263,13 @@ class SystemInfo:
             damp = zone_info.damp
 
             mismatches: set[str] = set()
-            for zone_number in range(start_zone+1, start_zone + num_zones):
+            for zone_number in range(start_zone+1, min(start_zone + num_zones, len(raw_response))):
+                # Additional bounds check
+                if (ResponseMessageOffsets.ZONE_DAMPS_START + zone_number >= len(raw_response) or
+                    ResponseMessageOffsets.ZONE_STATUSES_START + zone_number >= len(raw_response)):
+                    _LOGGER.warning(f"Zone {zone_number} access would exceed message bounds")
+                    break
+                    
                 zone_info = ZoneInfo.parse(raw_response[ResponseMessageOffsets.ZONE_DAMPS_START + zone_number],
                                            raw_response[ResponseMessageOffsets.ZONE_STATUSES_START + zone_number])
                 # this group is spilling if any of its zones are
@@ -269,8 +280,9 @@ class SystemInfo:
                     mismatches.add("damper percents")
                 if (active != zone_info.active):
                     mismatches.add("on/off states")
-                if mismatches:
-                    _LOGGER.warning(f"Zones of group '{name}' have mismatching {', '.join(mismatches)}")
+                    
+            if mismatches:
+                _LOGGER.warning(f"Zones of group '{name}' have mismatching {', '.join(mismatches)}")
 
             turbo = True if turbo_group == group_id else False
 
