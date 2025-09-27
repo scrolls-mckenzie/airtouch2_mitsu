@@ -1,5 +1,5 @@
 
-from airtouch2.common.Buffer import Buffer
+from ...common.Buffer import Buffer
 
 
 def checksum(data: bytearray) -> int:
