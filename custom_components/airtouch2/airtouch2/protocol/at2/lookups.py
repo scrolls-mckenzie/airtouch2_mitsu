@@ -23,6 +23,8 @@ from .enums import ACBrand
 # }
 
 # Lookup between the gateway ID and what brand I think it is
+# Known unknown gateway IDs that need investigation:
+# - 0xa7 (167): Brand unknown, reported by users
 GATEWAYID_BRAND_LOOKUP = {
     0x5  : ACBrand.MITSUBISHI_ELECTRIC,  # Added for Mitsubishi units
     0x8  : ACBrand.DAIKIN,
