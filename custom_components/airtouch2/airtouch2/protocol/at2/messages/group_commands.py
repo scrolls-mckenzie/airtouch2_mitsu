@@ -1,7 +1,7 @@
-from airtouch2.protocol.at2.constants import CommandMessageConstants, CommandMessageType, GroupCommands, MessageLength
-from airtouch2.protocol.at2.message_common import add_checksum_message_buffer
-from airtouch2.common.Buffer import Buffer
-from airtouch2.common.interfaces import Serializable
+from ..constants import CommandMessageConstants, CommandMessageType, GroupCommands, MessageLength
+from ..message_common import add_checksum_message_buffer
+from ....common.Buffer import Buffer
+from ....common.interfaces import Serializable
 
 
 def prime_group_control_message_buffer(target_group: int) -> Buffer:

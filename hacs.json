@@ -1,9 +1,12 @@
 {
   "name": "AirTouch 2",
   "content_in_root": false,
-  "filename": "airtouch2.zip",
-  "country": ["AU"],
-  "domains": ["climate"],
+  "country": [
+    "AU"
+  ],
+  "domains": [
+    "climate"
+  ],
   "iot_class": "Local Polling",
   "homeassistant": "2023.1.0"
 }
