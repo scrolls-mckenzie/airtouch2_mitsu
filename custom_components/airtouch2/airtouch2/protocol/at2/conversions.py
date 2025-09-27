@@ -29,9 +29,15 @@ def val_from_fan_speed(supported_speeds: list[ACFanSpeed], speed: ACFanSpeed):
 def brand_from_gateway_id(gateway_id: int) -> Optional[ACBrand]:
     if gateway_id > 0:
         if gateway_id in GATEWAYID_BRAND_LOOKUP:
-            return GATEWAYID_BRAND_LOOKUP[gateway_id]
+            brand = GATEWAYID_BRAND_LOOKUP[gateway_id]
+            # Log if this is one of the unknown gateway IDs we're guessing at
+            if gateway_id in [0xa7, 0xe5, 0xe9]:
+                _LOGGER.info(f"Using gateway ID {hex(gateway_id)} with assumed brand {brand.name}. "
+                           f"If AC control doesn't work properly, please report this gateway ID.")
+            return brand
         else:
             _LOGGER.warning(
-                f"AC has an unfamiliar gateway ID: {hex(gateway_id)} - " + OPEN_ISSUE_TEXT +
-                "\nInclude the gateway ID shown above")
+                f"Encountered unknown gateway ID: {hex(gateway_id)} ({gateway_id} decimal). "
+                f"System will attempt to use fallback brand detection. "
+                f"Please report this gateway ID with your AC brand/model - " + OPEN_ISSUE_TEXT)
     return None
