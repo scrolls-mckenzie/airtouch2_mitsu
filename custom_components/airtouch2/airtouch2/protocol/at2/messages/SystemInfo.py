@@ -133,6 +133,9 @@ class AcInfo:
             if ac_mode == 130:
                 _LOGGER.debug(f"AC {ac_number} using Mitsubishi mode 130, mapping to HEAT")
                 mode = ACMode.MITSUBISHI_MODE_130
+            elif ac_mode == 223:
+                _LOGGER.debug(f"AC {ac_number} using Mitsubishi mode 223, mapping to AUTO")
+                mode = ACMode.MITSUBISHI_MODE_223
             else:
                 _LOGGER.warning(f"AC {ac_number} reported unknown mode value {ac_mode}, defaulting to AUTO. " + OPEN_ISSUE_TEXT)
                 mode = ACMode.AUTO
