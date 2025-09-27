@@ -31,7 +31,7 @@ def brand_from_gateway_id(gateway_id: int) -> Optional[ACBrand]:
         if gateway_id in GATEWAYID_BRAND_LOOKUP:
             brand = GATEWAYID_BRAND_LOOKUP[gateway_id]
             # Log if this is one of the unknown gateway IDs we're guessing at
-            if gateway_id in [0xa7, 0xe5, 0xe9]:
+            if gateway_id in [0xa7, 0xd3, 0xe5, 0xe9]:
                 _LOGGER.info(f"Using gateway ID {hex(gateway_id)} with assumed brand {brand.name}. "
                            f"If AC control doesn't work properly, please report this gateway ID.")
             return brand
