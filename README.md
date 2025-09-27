@@ -5,7 +5,7 @@ This is the distribution repository for the AirTouch 2 Home Assistant integratio
 ## Version Information
 - Integration Version: 1.0.0
 - Library Version: 1.0.0
-- Build Date: 2025-09-27 10:40:16
+- Build Date: 2025-09-27 11:32:10
 
 ## Installation
 
