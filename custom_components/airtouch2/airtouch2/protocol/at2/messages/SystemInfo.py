@@ -5,12 +5,58 @@ from dataclasses import dataclass
 from itertools import compress
 from pprint import pformat
 from typing import Optional
+import time
 
 from ..constants import OPEN_ISSUE_TEXT, MessageLength, ResponseMessageConstants, ResponseMessageOffsets
 from ..conversions import brand_from_gateway_id, fan_speed_from_val
 from ..enums import ACBrand, ACFanSpeed, ACMode
 
 _LOGGER = logging.getLogger(__name__)
+
+
+class _LogRateLimiter:
+    """Rate limiter to prevent log spam from repeated errors."""
+    
+    def __init__(self, min_interval: float = 300.0):  # 5 minutes default
+        self.min_interval = min_interval
+        self.last_logged = {}
+        self.error_counts = {}
+        self.last_summary = 0
+        self.summary_interval = 900.0  # 15 minutes
+    
+    def should_log(self, key: str) -> bool:
+        """Check if we should log this error type."""
+        now = time.time()
+        last_time = self.last_logged.get(key, 0)
+        
+        if now - last_time >= self.min_interval:
+            self.last_logged[key] = now
+            # Include count in the decision
+            count = self.error_counts.get(key, 0) + 1
+            self.error_counts[key] = count
+            self._maybe_log_summary(now)
+            return True
+        else:
+            # Just increment counter
+            self.error_counts[key] = self.error_counts.get(key, 0) + 1
+            return False
+    
+    def get_count(self, key: str) -> int:
+        """Get the current error count for a key."""
+        return self.error_counts.get(key, 0)
+    
+    def _maybe_log_summary(self, now: float) -> None:
+        """Log a summary of suppressed errors periodically."""
+        if now - self.last_summary >= self.summary_interval and self.error_counts:
+            total_errors = sum(self.error_counts.values())
+            if total_errors > 0:
+                _LOGGER.info(f"AirTouch2: Suppressed {total_errors} repeated errors in the last {self.summary_interval/60:.0f} minutes to reduce log noise. "
+                           f"This is normal when experiencing data corruption from network issues.")
+                self.last_summary = now
+
+
+# Global rate limiter instance
+_rate_limiter = _LogRateLimiter()
 
 
 def _resolve_brand(gateway_id: int, reported_brand: int) -> ACBrand:
@@ -62,8 +108,13 @@ def _supported_fan_speeds(brand: ACBrand, num_supported_speeds: int, gateway_id:
     elif num_supported_speeds == 2:
         supported_speeds += [ACFanSpeed.LOW, ACFanSpeed.HIGH]
     elif num_supported_speeds < 2:
-        _LOGGER.warning(
-            f"AC reports less than 2 supported fan speeds, this is unusual - " + OPEN_ISSUE_TEXT)
+        # Rate limit this warning as it can be repetitive
+        error_key = f"low_fan_speeds_{brand}_{num_supported_speeds}"
+        if _rate_limiter.should_log(error_key):
+            count = _rate_limiter.get_count(error_key)
+            _LOGGER.warning(f"AC reports less than 2 supported fan speeds, this is unusual - " + OPEN_ISSUE_TEXT + f" (occurred {count} times)")
+        else:
+            _LOGGER.debug(f"AC reports less than 2 supported fan speeds (suppressed, count: {_rate_limiter.get_count(error_key)})")
 
     return supported_speeds
 
@@ -146,7 +197,13 @@ class AcInfo:
                 _LOGGER.debug(f"AC {ac_number} using Mitsubishi mode 223, mapping to AUTO")
                 mode = ACMode.MITSUBISHI_MODE_223
             else:
-                _LOGGER.warning(f"AC {ac_number} reported unknown mode value {ac_mode}, defaulting to AUTO. " + OPEN_ISSUE_TEXT)
+                # Rate limit unknown mode warnings
+                error_key = f"unknown_mode_{ac_number}_{ac_mode}"
+                if _rate_limiter.should_log(error_key):
+                    count = _rate_limiter.get_count(error_key)
+                    _LOGGER.warning(f"AC {ac_number} reported unknown mode value {ac_mode}, defaulting to AUTO. " + OPEN_ISSUE_TEXT + f" (occurred {count} times)")
+                else:
+                    _LOGGER.debug(f"AC {ac_number} unknown mode {ac_mode} (suppressed, count: {_rate_limiter.get_count(error_key)})")
                 mode = ACMode.AUTO
 
         brand = _resolve_brand(ac_gateway_id, ac_brand)
@@ -237,7 +294,14 @@ class SystemInfo:
                     if ac_info is not None:
                         aircons_by_id[ac_id] = ac_info
                 except Exception as e:
-                    _LOGGER.error(f"Error parsing AC {ac_id}: {e}. Skipping this AC to prevent system hang.")
+                    # Rate limit AC parsing errors to reduce log spam
+                    error_key = f"ac_parse_error_{ac_id}"
+                    if _rate_limiter.should_log(error_key):
+                        count = _rate_limiter.get_count(error_key)
+                        _LOGGER.warning(f"Error parsing AC {ac_id}: {e}. Skipping this AC to prevent system hang. (occurred {count} times)")
+                    else:
+                        # Log at debug level for subsequent occurrences
+                        _LOGGER.debug(f"Error parsing AC {ac_id}: {e} (suppressed, count: {_rate_limiter.get_count(error_key)})")
                     continue
         except Exception as e:
             _LOGGER.error(f"Critical error parsing ACs: {e}. Continuing with empty AC list.")
@@ -306,10 +370,17 @@ class SystemInfo:
         system_name = "Unknown"
         try:
             touchpad_temp = raw_response[ResponseMessageOffsets.TOUCHPAD_TEMP]
-            system_name = raw_response[ResponseMessageOffsets.SYSTEM_NAME: ResponseMessageOffsets.SYSTEM_NAME +
-                                       ResponseMessageConstants.LONG_STRING_LENGTH].decode().split("\0")[0]
+            system_name_bytes = raw_response[ResponseMessageOffsets.SYSTEM_NAME: ResponseMessageOffsets.SYSTEM_NAME +
+                                            ResponseMessageConstants.LONG_STRING_LENGTH]
+            system_name = _parse_name(system_name_bytes)
         except Exception as e:
-            _LOGGER.error(f"Error parsing system info: {e}. Using defaults.")
+            # Rate limit system info parsing errors
+            error_key = "system_info_parse_error"
+            if _rate_limiter.should_log(error_key):
+                count = _rate_limiter.get_count(error_key)
+                _LOGGER.warning(f"Error parsing system info: {e}. Using defaults. (occurred {count} times)")
+            else:
+                _LOGGER.debug(f"Error parsing system info: {e} (suppressed, count: {_rate_limiter.get_count(error_key)})")
 
         return SystemInfo(aircons_by_id, groups_by_id, touchpad_temp, system_name)
 

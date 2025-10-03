@@ -2,10 +2,15 @@ import asyncio
 import errno
 import logging
 import socket
+import time
 from typing import Callable, Optional
 from .interfaces import CoroCallback, Serializable, TaskCreator
 
 _LOGGER = logging.getLogger(__name__)
+
+# Simple rate limiter for connection messages
+_last_connection_warning = 0
+_connection_warning_interval = 60.0  # 1 minute
 
 NetworkOrHostDownErrors = (errno.EHOSTUNREACH, errno.ECONNREFUSED,  errno.ETIMEDOUT,
                            errno.ENETDOWN, errno.ENETUNREACH, errno.ENETRESET, errno.ECONNABORTED)
@@ -121,7 +126,14 @@ class NetClient:
             data = None
 
         if data is None:
-            _LOGGER.warning("Connection lost, reconnecting")
+            # Rate limit connection lost warnings
+            global _last_connection_warning
+            now = time.time()
+            if now - _last_connection_warning >= _connection_warning_interval:
+                _LOGGER.warning("Connection lost, reconnecting")
+                _last_connection_warning = now
+            else:
+                _LOGGER.debug("Connection lost, reconnecting (message suppressed)")
             await self._try_reconnect()
             return None
         _LOGGER.debug(f"Read payload of size {size}: {data.hex(':')}")
